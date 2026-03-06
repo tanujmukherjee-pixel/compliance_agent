@@ -25,8 +25,14 @@ export default function NoticeCard({ notice }) {
         <span>📅 <strong>{notice.date}</strong> · {notice.time}</span>
         <span>👤 {notice.sender} · {notice.senderTitle}</span>
         <span>🏷 {notice.category}</span>
+        {notice.system && <span>🔧 System: <strong>{notice.system}</strong></span>}
         <span>👥 {notice.ownerTeam}</span>
       </div>
+      {notice.actionRequired && (
+        <div className="mt-2 text-xs text-gray-700 bg-white/60 rounded-lg px-3 py-2 border border-gray-200">
+          <span className="font-semibold text-gray-800">Action Required: </span>{notice.actionRequired}
+        </div>
+      )}
 
       <div className="mt-3 flex flex-wrap gap-2">
         <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${isOverdue ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
