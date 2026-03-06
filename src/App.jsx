@@ -11,13 +11,13 @@ const TABS = ["Dashboard", "Notice Detail", "Routing Matrix", "Metrics Log"];
 function categoryCounts(metrics) {
   const m = {};
   metrics.forEach(r => { m[r.category] = (m[r.category] || 0) + 1; });
-  return Object.entries(m).map(([label, value]) => ({ label, value }));
+  return m;
 }
 
 function statusCounts(metrics) {
   const m = {};
   metrics.forEach(r => { m[r.status] = (m[r.status] || 0) + 1; });
-  return Object.entries(m).map(([label, value]) => ({ label, value }));
+  return m;
 }
 
 export default function App() {
