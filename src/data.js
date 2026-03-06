@@ -1,7 +1,7 @@
 // Google Sheet data source
 export const SHEET_ID = "17hUKu3p78VPnpZQfWXBMwz9GjeT1Dd37TR0ZCUdsPr8";
-export const SHEET_GID = "0";
-export const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+export const SHEET_NAME = "Sheet2";
+export const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
 
 // Fallback static data from NPCI_circulars.xlsx
 export const FALLBACK_DATA = {
