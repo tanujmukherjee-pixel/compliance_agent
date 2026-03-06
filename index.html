@@ -3,108 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compliance Notice Tracking Dashboard</title>
+  <title>Compliance Agent Dashboard</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <main class="page">
     <header class="hero">
-      <p class="eyebrow">Regulatory Intelligence</p>
-      <h1>NPCI Compliance Notice Tracking Dashboard</h1>
-      <p class="sub">Tracks intake, actions, deadlines, risk, ownership, investigations, and automation coverage.</p>
+      <p class="eyebrow">NPCI Monitoring</p>
+      <h1>Compliance Agent Dashboard</h1>
+      <p class="sub">Web dashboard generated from <code>NPCI_circulars.xlsx</code></p>
     </header>
-
-    <section class="panel filters">
-      <h2>Filters</h2>
-      <div class="filter-grid">
-        <label>Team
-          <select id="teamFilter"></select>
-        </label>
-        <label>Risk
-          <select id="riskFilter"></select>
-        </label>
-        <label>Category
-          <select id="categoryFilter"></select>
-        </label>
-        <label>Deadline
-          <select id="deadlineFilter">
-            <option value="All">All</option>
-            <option value="Due Today">Due Today</option>
-            <option value="Due in 3 Days">Due in 3 Days</option>
-            <option value="Due in 7 Days">Due in 7 Days</option>
-            <option value="Overdue">Overdue</option>
-            <option value="No Deadline">No Deadline</option>
-          </select>
-        </label>
-      </div>
-    </section>
 
     <section class="kpis" id="kpis"></section>
 
-    <section class="grid four">
+    <section class="grid">
       <article class="panel">
-        <h2>Notices by Category</h2>
+        <h2>Metrics by Category</h2>
         <div id="categoryChart" class="chart"></div>
       </article>
       <article class="panel">
-        <h2>Notices by Risk</h2>
-        <div id="riskChart" class="chart"></div>
-      </article>
-      <article class="panel">
-        <h2>Notices by Product Impact</h2>
-        <div id="productChart" class="chart"></div>
-      </article>
-      <article class="panel">
-        <h2>Notices by Owner/Team</h2>
-        <div id="ownerChart" class="chart"></div>
-      </article>
-      <article class="panel">
-        <h2>Notices by Status</h2>
+        <h2>Metrics by Status</h2>
         <div id="statusChart" class="chart"></div>
       </article>
-      <article class="panel">
-        <h2>Weekly Notice Trend</h2>
-        <div id="trendChart" class="chart"></div>
-      </article>
     </section>
 
     <section class="panel">
-      <h2>Deadline Risk Heatmap</h2>
-      <div id="deadlineHeatmap" class="heatmap"></div>
-    </section>
-
-    <section class="grid two">
-      <article class="panel">
-        <h2>AI Compliance Copilot</h2>
-        <div class="copilot">
-          <input id="copilotInput" type="text" placeholder="Ask: What notices are due this week?" />
-          <button id="copilotAsk">Ask</button>
-        </div>
-        <div id="copilotOutput" class="copilot-output"></div>
-      </article>
-      <article class="panel">
-        <h2>Automation Metrics</h2>
-        <ul id="automationList" class="metric-list"></ul>
-      </article>
-    </section>
-
-    <section class="panel">
-      <h2>Detailed Compliance Notices</h2>
+      <h2>Detailed Metrics</h2>
       <div class="table-wrap">
-        <table id="noticeTable">
+        <table>
           <thead>
             <tr>
-              <th data-sort="date">Date</th>
-              <th data-sort="noticeId">Notice ID</th>
-              <th data-sort="source">Source</th>
-              <th data-sort="category">Category</th>
-              <th data-sort="riskLevel">Risk</th>
-              <th data-sort="productImpact">Product Impact</th>
-              <th data-sort="ownerTeam">Owner / Team</th>
-              <th data-sort="deadline">Deadline</th>
-              <th data-sort="status">Status</th>
-              <th data-sort="summary">Summary</th>
-              <th data-sort="evidence">Evidence</th>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Metric</th>
+              <th>Value</th>
+              <th>Status</th>
+              <th>Summary</th>
             </tr>
           </thead>
           <tbody id="rows"></tbody>
