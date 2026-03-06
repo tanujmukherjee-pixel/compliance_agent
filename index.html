@@ -1,54 +1,14 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compliance Agent Dashboard</title>
-  <link rel="stylesheet" href="./styles.css" />
-</head>
-<body>
-  <main class="page">
-    <header class="hero">
-      <p class="eyebrow">NPCI Monitoring</p>
-      <h1>Compliance Agent Dashboard</h1>
-      <p class="sub">Live web dashboard synced from Google Sheets</p>
-      <p class="sub" id="sourceInfo"></p>
-    </header>
-
-    <section class="kpis" id="kpis"></section>
-
-    <section class="grid">
-      <article class="panel">
-        <h2>Metrics by Category</h2>
-        <div id="categoryChart" class="chart"></div>
-      </article>
-      <article class="panel">
-        <h2>Metrics by Status</h2>
-        <div id="statusChart" class="chart"></div>
-      </article>
-    </section>
-
-    <section class="panel">
-      <h2>Detailed Metrics</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Category</th>
-              <th>Metric</th>
-              <th>Value</th>
-              <th>Status</th>
-              <th>Summary</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <script src="./data.js"></script>
-  <script src="./app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/compliance_agent/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>npci_dashboard</title>
+    <script type="module" crossorigin src="/compliance_agent/assets/index-BcNjTF0c.js"></script>
+    <link rel="stylesheet" crossorigin href="/compliance_agent/assets/index-DNQSUvVJ.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
