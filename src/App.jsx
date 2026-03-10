@@ -28,10 +28,16 @@ function statusCounts(metrics) {
 
 export default function App() {
   const [tab, setTab] = useState(0);
+  const [activeFilter, setActiveFilter] = useState(null); // null | "CRITICAL" | "HIGH" | "BUSINESS_RISK" | "ESCALATED" | "UPCOMING"
   const [data, setData] = useState(FALLBACK_DATA);
   const [source, setSource] = useState("fallback");
   const [loading, setLoading] = useState(true);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  function goToNotices(filter) {
+    setActiveFilter(filter);
+    setTab(1);
+  }
 
   useEffect(() => {
     fetchSheetData()
@@ -106,7 +112,7 @@ export default function App() {
           {TAB_LABELS.map((t, i) => (
             <button
               key={t}
-              onClick={() => setTab(i)}
+              onClick={() => { setTab(i); if (i !== 1) setActiveFilter(null); }}
               className={`relative px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 tab === i
                   ? "border-[#1F3864] text-[#1F3864]"
@@ -135,33 +141,38 @@ export default function App() {
               <KpiCard
                 label="Active Notices" value={NOTICES.length} icon="📋"
                 border="border-l-4 border-[#1F3864]" accent="text-[#1F3864]"
-                sub="total tracked"
+                sub="click to view all →"
+                onClick={() => goToNotices(null)}
               />
               <KpiCard
                 label="Critical" value={critical} icon="🔴"
                 border="border-l-4 border-red-600" accent="text-red-600"
-                sub="action required today"
+                sub="click to filter →"
                 progress={NOTICES.length ? (critical / NOTICES.length) * 100 : 0}
                 progressColor="bg-red-500"
+                onClick={() => goToNotices("CRITICAL")}
               />
               <KpiCard
                 label="High Priority" value={high} icon="🟠"
                 border="border-l-4 border-orange-500" accent="text-orange-500"
-                sub="within 72h TAT"
+                sub="click to filter →"
                 progress={NOTICES.length ? (high / NOTICES.length) * 100 : 0}
                 progressColor="bg-orange-400"
+                onClick={() => goToNotices("HIGH")}
               />
               <KpiCard
                 label="Business at Risk" value={biz} icon="⚠️"
                 border="border-l-4 border-red-700" accent="text-red-700"
-                sub={escalated > 0 ? `${escalated} escalated to CEO` : "monitor closely"}
+                sub="click to filter →"
+                onClick={() => goToNotices("BUSINESS_RISK")}
               />
               <KpiCard
                 label="Next Deadline" icon="⏱"
                 value={nextDeadline ? `${Math.max(0, daysLeft(nextDeadline.deadline))}d` : "—"}
                 border={`border-l-4 ${nextDeadline && daysLeft(nextDeadline.deadline) <= 1 ? "border-red-500" : "border-yellow-400"}`}
                 accent={nextDeadline && daysLeft(nextDeadline.deadline) <= 1 ? "text-red-600" : "text-yellow-600"}
-                sub={nextDeadline ? nextDeadline.deadline : "no upcoming"}
+                sub="click to view upcoming →"
+                onClick={() => goToNotices("UPCOMING")}
               />
             </div>
 
@@ -215,15 +226,43 @@ export default function App() {
         )}
 
         {/* ── Tab 1: Notice Detail ── */}
-        {tab === 1 && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-gray-800">Notice Register</h2>
-              <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1">{NOTICES.length} notices</span>
+        {tab === 1 && (() => {
+          const FILTER_LABELS = {
+            CRITICAL: { label: "🔴 Critical only", fn: n => n.severity === "CRITICAL" },
+            HIGH: { label: "🟠 High Priority only", fn: n => n.severity === "HIGH" },
+            BUSINESS_RISK: { label: "⚠️ Business at Risk", fn: n => n.businessRisk },
+            ESCALATED: { label: "↑ Escalated", fn: n => n.escalated },
+            UPCOMING: { label: "⏱ Upcoming deadlines", fn: n => (daysLeft(n.deadline) ?? -1) >= 0 },
+          };
+          const filterDef = activeFilter ? FILTER_LABELS[activeFilter] : null;
+          const filtered = filterDef ? NOTICES.filter(filterDef.fn) : NOTICES;
+          return (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="text-base font-semibold text-gray-800">Notice Register</h2>
+                <div className="flex items-center gap-2">
+                  {filterDef && (
+                    <span className="inline-flex items-center gap-1.5 text-xs bg-[#1F3864] text-white px-3 py-1 rounded-full font-medium">
+                      {filterDef.label}
+                      <button
+                        onClick={() => setActiveFilter(null)}
+                        className="ml-1 hover:text-red-300 font-bold text-sm leading-none"
+                        aria-label="Clear filter"
+                      >×</button>
+                    </span>
+                  )}
+                  <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1">
+                    {filtered.length} of {NOTICES.length} notices
+                  </span>
+                </div>
+              </div>
+              {filtered.length === 0
+                ? <p className="text-sm text-gray-400 py-8 text-center">No notices match this filter.</p>
+                : filtered.map(n => <NoticeCard key={n.id} notice={n} />)
+              }
             </div>
-            {NOTICES.map(n => <NoticeCard key={n.id} notice={n} />)}
-          </div>
-        )}
+          );
+        })()}
 
         {/* ── Tab 2: Routing Matrix ── */}
         {tab === 2 && (
