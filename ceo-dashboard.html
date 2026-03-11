@@ -6,288 +6,251 @@
 <title>CEO Dashboard — NPCI & PSP Banks Engagement</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
+  /* ══ PAYTM BRAND COLOR SYSTEM ══
+     Primary:   #002E6E  Dark Midnight Blue  (authority, trust)
+     Secondary: #00B9F1  Process Cyan        (Paytm signature)
+     Urgent:    #EF4E28  Paytm Flame         (warm urgency, not fear)
+     Amber:     #F5A623  Amber               (high priority / warning)
+     Green:     #04DB7C  Paytm Green         (success / resolved)
+     Support:   #0481C0  Mid Blue            (secondary UI)
+  ═══════════════════════════════════════════════════════ */
   :root {
-    --dark-blue:  #1F3864;
-    --mid-blue:   #2E75B6;
-    --accent:     #4472C4;
-    --teal:       #00B0F0;
-    --green:      #70AD47;
-    --red:        #C00000;
-    --orange:     #ED7D31;
-    --gold:       #C9A227;
-    --gray:       #595959;
-    --light-gray: #F4F6F9;
-    --white:      #FFFFFF;
-    --border:     #DEE2E6;
-    --text:       #1a1a2e;
-    --muted:      #6c757d;
+    --navy:       #002E6E;   /* Paytm Dark Midnight Blue – primary */
+    --cyan:       #00B9F1;   /* Paytm Process Cyan – secondary */
+    --blue:       #0481C0;   /* Supporting mid-blue */
+    --blue-lt:    #C6DAE6;   /* Light blue background tints */
+    --green:      #04DB7C;   /* Paytm Green – success/closed */
+    --green-lt:   #D4F7EA;
+    --flame:      #EF4E28;   /* Paytm Flame – urgent (warm, not fearful) */
+    --flame-lt:   #FDEEE9;
+    --amber:      #F5A623;   /* Amber – high priority */
+    --amber-lt:   #FEF3DC;
+    --yellow:     #FCC47A;   /* Soft yellow – medium priority */
+    --yellow-lt:  #FFF8EE;
+    --bg:         #EBF3FB;   /* Page background */
+    --surface:    #FFFFFF;
+    --border:     #C8DFF0;
+    --text:       #0D1F3C;
+    --muted:      #5A7A9A;
+    --gray-lt:    #F0F6FC;
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { font-family: Arial, sans-serif; background: #EEF2F7; color: var(--text); font-size: 13px; }
+  body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 13px; }
 
-  /* ── HEADER ── */
+  /* ══ HEADER ══ */
   header {
-    background: linear-gradient(135deg, #1a2f5a 0%, #2c4a8a 100%);
+    background: linear-gradient(120deg, #001d4a 0%, var(--navy) 60%, #004080 100%);
     color: #fff;
     padding: 18px 32px 14px;
     display: flex; justify-content: space-between; align-items: flex-start;
     position: sticky; top: 0; z-index: 200;
-    box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    box-shadow: 0 3px 20px rgba(0,46,110,.4);
   }
-  header h1 { font-size: 18px; font-weight: 800; letter-spacing: .3px; }
-  header .subtitle { font-size: 10px; color: #8ab4e0; margin-top: 4px; }
+  header h1 { font-size: 18px; font-weight: 800; letter-spacing: .2px; }
+  .subtitle  { font-size: 10px; color: #87bde0; margin-top: 4px; }
   .nav-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-  .nav-pill {
-    padding: 5px 12px; border-radius: 16px; font-size: 10px; font-weight: 700;
+  .nav-pill  {
+    padding: 5px 13px; border-radius: 16px; font-size: 10px; font-weight: 700;
     cursor: pointer; border: none; text-decoration: none;
     transition: all .2s; letter-spacing: .3px; white-space: nowrap;
   }
-  .nav-pill.reg   { background:#C00000; color:#fff; }
-  .nav-pill.crit  { background:#ED7D31; color:#fff; }
-  .nav-pill.psp   { background:#C9A227; color:#fff; }
-  .nav-pill.tpap  { background:#2E75B6; color:#fff; }
-  .nav-pill.mkt   { background:#00B0F0; color:#fff; }
+  .np-reg  { background: var(--navy);  color: #fff; border: 1.5px solid #00B9F1; }
+  .np-crit { background: var(--flame); color: #fff; }
+  .np-psp  { background: var(--amber); color: #fff; }
+  .np-tpap { background: var(--cyan);  color: var(--navy); font-weight: 800; }
+  .np-mkt  { background: var(--blue);  color: #fff; }
   .nav-pill:hover { opacity:.85; transform:translateY(-1px); }
 
-  /* ── MAIN ── */
-  main { max-width: 1440px; margin: 0 auto; padding: 24px 24px 60px; }
+  /* ══ MAIN ══ */
+  main { max-width: 1440px; margin: 0 auto; padding: 22px 24px 60px; }
 
-  /* ── ATTENTION BANNER ── */
+  /* ══ ATTENTION BANNER ══ */
   .attention-bar {
-    background: linear-gradient(90deg, #C00000, #e83232);
+    background: linear-gradient(90deg, var(--flame), #c93d1b);
     color: #fff;
-    padding: 9px 18px;
+    padding: 10px 18px;
     border-radius: 8px;
     margin-bottom: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex; align-items: center; gap: 10px;
-    box-shadow: 0 2px 8px rgba(192,0,0,.3);
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    box-shadow: 0 3px 12px rgba(239,78,40,.35);
   }
-  .attention-bar .pill {
+  .ab-pill {
     background: rgba(255,255,255,.2);
-    border-radius: 12px;
-    padding: 2px 10px;
-    font-size: 10px;
+    border-radius: 12px; padding: 3px 11px; font-size: 10px;
   }
 
-  /* ── KPI GRID ── */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .kpi-col { display: flex; flex-direction: column; gap: 0; }
+  /* ══ KPI GRID ══ */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-col  { display: flex; flex-direction: column; }
 
-  /* KPI Card */
   .kpi-card {
     border-radius: 10px 10px 0 0;
     padding: 18px 18px 14px;
     color: #fff;
-    cursor: pointer;
+    cursor: pointer; text-decoration: none;
     position: relative; overflow: hidden;
     transition: transform .2s, box-shadow .2s;
-    text-decoration: none;
   }
-  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,.22); }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,.22); }
   .kpi-card::before {
-    content: ''; position: absolute; right:-18px; top:-18px;
-    width: 90px; height: 90px; border-radius: 50%;
-    background: rgba(255,255,255,.08);
+    content:''; position:absolute; right:-16px; top:-16px;
+    width:80px; height:80px; border-radius:50%;
+    background:rgba(255,255,255,.08);
   }
   .kpi-card::after {
-    content: ''; position: absolute; left:-10px; bottom:-20px;
-    width: 70px; height: 70px; border-radius: 50%;
-    background: rgba(255,255,255,.05);
+    content:''; position:absolute; left:-10px; bottom:-20px;
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(255,255,255,.05);
   }
-  .kpi-tag {
-    font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
-    text-transform: uppercase; opacity: .7;
-    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
-  }
-  .kpi-tag .entity-badge {
-    background: rgba(255,255,255,.2);
-    border-radius: 10px; padding: 1px 8px;
-    font-size: 8px; letter-spacing: .5px;
-  }
-  .kpi-title  { font-size: 11px; font-weight: 700; margin-bottom: 6px; opacity: .9; }
-  .kpi-value  { font-size: 44px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
-  .kpi-sub    { font-size: 10px; opacity: .75; line-height: 1.5; }
-  .kpi-period { font-size: 9px; opacity: .6; margin-top: 8px; font-style: italic; }
-  .kpi-arrow  {
-    position: absolute; bottom: 10px; right: 14px;
-    font-size: 16px; opacity: .5;
-  }
-  .kpi-reg    { background: linear-gradient(135deg, #a00000, #C00000); }
-  .kpi-crit   { background: linear-gradient(135deg, #b85c10, #ED7D31); }
-  .kpi-psp    { background: linear-gradient(135deg, #8a6e00, #C9A227); }
-  .kpi-tpap   { background: linear-gradient(135deg, #1a4d8a, #2E75B6); }
+  .kpi-tag { font-size:9px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; opacity:.75; display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .entity-badge { background:rgba(255,255,255,.2); border-radius:10px; padding:1px 8px; font-size:8px; letter-spacing:.4px; }
+  .kpi-title  { font-size:11px; font-weight:700; margin-bottom:6px; opacity:.9; }
+  .kpi-value  { font-size:44px; font-weight:900; line-height:1; margin-bottom:4px; }
+  .kpi-sub    { font-size:10px; opacity:.75; line-height:1.5; }
+  .kpi-period { font-size:9px; opacity:.55; margin-top:9px; font-style:italic; }
+  .kpi-arrow  { position:absolute; bottom:10px; right:14px; font-size:15px; opacity:.4; }
+
+  /* KPI colour themes — Paytm palette */
+  .kk-navy  { background: linear-gradient(135deg, #001d4a, var(--navy)); }
+  .kk-flame { background: linear-gradient(135deg, #c93d1b, var(--flame)); }
+  .kk-amber { background: linear-gradient(135deg, #c07a00, var(--amber)); }
+  .kk-cyan  { background: linear-gradient(135deg, #0070a8, var(--cyan)); }
 
   /* Mini chart below each KPI */
   .kpi-chart-box {
-    background: #fff;
+    background: var(--surface);
     border-radius: 0 0 10px 10px;
     padding: 12px 14px 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    border-top: 1px solid var(--border);
+    box-shadow: 0 4px 14px rgba(0,46,110,.1);
+    border-top: 2px solid var(--border);
+    flex: 1;
   }
-  .kpi-chart-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
-  .kpi-chart-wrap  { position: relative; height: 130px; }
+  .kpi-chart-label { font-size:9px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+  .kpi-chart-wrap  { position:relative; height:130px; }
 
-  /* ── SECTION ── */
+  /* ══ SECTIONS ══ */
   .section-header {
     display: flex; align-items: center; gap: 12px;
     padding: 12px 18px;
     border-radius: 8px 8px 0 0;
     margin-top: 32px;
   }
-  .section-header .sh-icon { font-size: 18px; }
-  .section-header .sh-text h2 { font-size: 13px; font-weight: 800; color: #fff; }
-  .section-header .sh-text .sh-sub { font-size: 10px; color: rgba(255,255,255,.7); margin-top: 2px; }
-  .section-header .sh-meta {
-    margin-left: auto; font-size: 9px; font-weight: 700;
-    background: rgba(255,255,255,.2); border-radius: 12px; padding: 3px 12px; color: #fff;
-  }
-  .sh-reg   { background: linear-gradient(90deg, #a00000, #C00000); }
-  .sh-crit  { background: linear-gradient(90deg, #b85c10, #ED7D31); }
-  .sh-psp   { background: linear-gradient(90deg, #8a6e00, #C9A227); }
-  .sh-tpap  { background: linear-gradient(90deg, #1a4d8a, #2E75B6); }
-  .sh-mkt   { background: linear-gradient(90deg, #006B8C, #00B0F0); }
-  .sh-fin   { background: linear-gradient(90deg, #2d7a2d, #70AD47); }
+  .sh-icon { font-size:18px; }
+  .sh-text h2 { font-size:13px; font-weight:800; color:#fff; }
+  .sh-text .sh-sub { font-size:10px; color:rgba(255,255,255,.72); margin-top:2px; }
+  .sh-meta { margin-left:auto; font-size:9px; font-weight:700; background:rgba(255,255,255,.2); border-radius:12px; padding:3px 12px; color:#fff; white-space:nowrap; }
 
-  .section-body {
-    background: #fff;
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.07);
-    overflow: hidden;
-  }
+  .sh-navy  { background: linear-gradient(90deg, #001d4a, var(--navy)); }
+  .sh-flame { background: linear-gradient(90deg, #c93d1b, var(--flame)); }
+  .sh-amber { background: linear-gradient(90deg, #c07a00, var(--amber)); }
+  .sh-cyan  { background: linear-gradient(90deg, #0070a8, var(--cyan)); }
+  .sh-blue  { background: linear-gradient(90deg, #005a8a, var(--blue)); }
+  .sh-green { background: linear-gradient(90deg, #019050, var(--green)); }
+
+  .section-body { background: var(--surface); border-radius: 0 0 10px 10px; box-shadow: 0 2px 14px rgba(0,46,110,.08); overflow:hidden; }
   .section-inner { padding: 20px; }
 
-  /* ── STAT ROW ── */
-  .stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
-  .stat-pill {
-    padding: 5px 12px; border-radius: 16px; font-size: 11px;
-    font-weight: 700; display: flex; align-items: center; gap: 5px;
-  }
-  .stat-period { font-size: 10px; color: var(--muted); font-style: italic; margin-left: auto; }
+  /* ══ STAT PILLS ══ */
+  .stat-row   { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+  .stat-pill  { padding:5px 12px; border-radius:16px; font-size:11px; font-weight:700; display:flex; align-items:center; gap:5px; }
+  .stat-period{ font-size:10px; color:var(--muted); font-style:italic; margin-left:auto; }
 
-  /* ── TABLES ── */
-  table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  th {
-    padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .5px; white-space: nowrap;
-    color: #fff; background: var(--dark-blue);
-  }
-  td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; line-height: 1.4; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f5f8ff !important; }
-  .tbl-stripe tbody tr:nth-child(even) td { background: #fafbfc; }
+  /* ══ TABLES ══ */
+  table { width:100%; border-collapse:collapse; font-size:11px; }
+  th { padding:10px 12px; text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; color:#fff; background:var(--navy); }
+  td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; line-height:1.4; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#EBF3FB !important; }
+  .tbl-stripe tbody tr:nth-child(even) td { background:var(--gray-lt); }
 
-  /* ── BADGES ── */
-  .badge {
-    display: inline-block; padding: 2px 9px; border-radius: 10px;
-    font-size: 9px; font-weight: 800; letter-spacing: .3px; white-space: nowrap;
-  }
-  .b-open   { background:#fdecea; color:var(--red); border:1px solid #f5c6c6; }
-  .b-closed { background:#e8f5e9; color:#2d7a2d; border:1px solid #b8ddb8; }
-  .b-hold   { background:#fff3e0; color:var(--orange); border:1px solid #ffd49b; }
-  .b-due    { background:#fffde7; color:var(--gold); border:1px solid #fce97d; }
-  .b-p0     { background:#fdecea; color:var(--red); border:1px solid #f5c6c6; }
-  .b-p1     { background:#fff3e0; color:var(--orange); border:1px solid #ffd49b; }
-  .b-p2     { background:#fffde7; color:var(--gold); border:1px solid #fce97d; }
-  .b-reg    { background:#e8e0ff; color:#5b00c4; border:1px solid #c4a8ff; }
+  /* ══ BADGES ══ */
+  .badge { display:inline-block; padding:2px 9px; border-radius:10px; font-size:9px; font-weight:800; letter-spacing:.3px; white-space:nowrap; }
+  .b-open   { background:var(--flame-lt); color:var(--flame); border:1px solid #f9b8a8; }
+  .b-closed { background:var(--green-lt); color:#019050;      border:1px solid #82e8be; }
+  .b-hold   { background:var(--amber-lt); color:#c07a00;      border:1px solid #f7cc80; }
+  .b-due    { background:var(--yellow-lt);color:#b06000;      border:1px solid #f7d49a; }
+  .b-p0     { background:var(--flame-lt); color:var(--flame); border:1px solid #f9b8a8; }
+  .b-p1     { background:var(--amber-lt); color:#c07a00;      border:1px solid #f7cc80; }
+  .b-p2     { background:var(--yellow-lt);color:#b06000;      border:1px solid #f7d49a; }
+  .b-reg    { background:#E0EEFF;         color:var(--navy);  border:1px solid #9ABDE8; }
 
-  /* ── AGING ── */
+  /* ══ AGING ══ */
   .aging { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; }
-  .dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
-  .dot-r { background:var(--red); }
-  .dot-o { background:var(--orange); }
+  .dot   { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dot-r { background:var(--flame); }
+  .dot-o { background:var(--amber); }
   .dot-g { background:var(--green); }
-  .dot-y { background:var(--gold); }
+  .dot-y { background:var(--yellow); }
 
-  /* ── BAR ── */
+  /* ══ BAR ══ */
   .bar-wrap { display:flex; align-items:center; gap:8px; }
-  .bar-bg { flex:1; height:7px; background:var(--light-gray); border-radius:4px; overflow:hidden; }
+  .bar-bg   { flex:1; height:7px; background:var(--blue-lt); border-radius:4px; overflow:hidden; }
   .bar-fill { height:100%; border-radius:4px; }
-  .bar-pct { font-size:10px; font-weight:700; width:38px; text-align:right; color:var(--dark-blue); }
+  .bar-pct  { font-size:10px; font-weight:700; width:38px; text-align:right; color:var(--navy); }
 
-  /* ── BANK CARDS ── */
+  /* ══ BANK CARDS ══ */
   .bank-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
   .bank-card {
     border-radius:8px; padding:16px; border-top:4px solid;
-    background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.06);
-    cursor: pointer; transition: transform .15s, box-shadow .15s;
+    background:var(--surface); box-shadow:0 2px 8px rgba(0,46,110,.08);
+    cursor:pointer; transition:transform .15s, box-shadow .15s;
   }
-  .bank-card:hover { transform: translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.12); }
-  .bank-card.sbi   { border-color:var(--red); }
-  .bank-card.hdfc  { border-color:var(--orange); }
-  .bank-card.ybl   { border-color:var(--gold); }
-  .bank-card.axis  { border-color:var(--mid-blue); }
-  .bc-entity  { font-size:9px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; }
-  .bc-name    { font-size:16px; font-weight:800; margin:4px 0 2px; }
-  .bc-count   { font-size:38px; font-weight:900; line-height:1; margin:4px 0; }
-  .bc-label   { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; }
-  .bc-detail  { font-size:10px; color:#444; margin-top:8px; line-height:1.6; }
-  .bc-period  { font-size:9px; color:var(--muted); font-style:italic; margin-top:6px; }
+  .bank-card:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,46,110,.16); }
+  .bank-card.sbi  { border-color:var(--flame); }
+  .bank-card.hdfc { border-color:var(--amber); }
+  .bank-card.ybl  { border-color:var(--cyan);  }
+  .bank-card.axis { border-color:var(--blue);  }
+  .bc-entity { font-size:9px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; }
+  .bc-name   { font-size:16px; font-weight:800; margin:4px 0 2px; }
+  .bc-count  { font-size:38px; font-weight:900; line-height:1; margin:4px 0; }
+  .bc-label  { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; }
+  .bc-detail { font-size:10px; color:#333; margin-top:8px; line-height:1.6; }
+  .bc-period { font-size:9px; color:var(--muted); font-style:italic; margin-top:6px; }
 
-  /* ── TWO COL ── */
+  /* ══ TWO COL ══ */
   .two-col { display:grid; grid-template-columns:1.1fr 1fr; gap:20px; }
-  .chart-panel { background:#fff; border-radius:8px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
-  .cp-title { font-size:10px; font-weight:700; color:var(--dark-blue); text-transform:uppercase; letter-spacing:.6px; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--light-gray); }
-  .cp-wrap { position:relative; height:200px; }
+  .chart-panel { background:var(--gray-lt); border-radius:8px; padding:16px; }
+  .cp-title { font-size:10px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.6px; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--border); }
+  .cp-wrap  { position:relative; height:200px; }
 
-  /* ── ECO BARS ── */
-  .eco-row { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); }
+  /* ══ ECOSYSTEM ══ */
+  .eco-row  { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); }
   .eco-row:last-child { border:none; }
   .eco-rank { width:20px; font-size:10px; color:var(--muted); text-align:center; font-weight:700; }
   .eco-name { width:130px; font-size:11px; font-weight:600; }
-  .eco-bar-bg { flex:1; height:10px; background:var(--light-gray); border-radius:5px; overflow:hidden; }
+  .eco-bar-bg   { flex:1; height:10px; background:var(--blue-lt); border-radius:5px; overflow:hidden; }
   .eco-bar-fill { height:100%; border-radius:5px; transition:width .6s ease; }
-  .eco-vol { width:80px; font-size:10px; text-align:right; color:var(--dark-blue); font-weight:700; }
+  .eco-vol { width:80px; font-size:10px; text-align:right; color:var(--navy); font-weight:700; }
   .eco-pct { width:40px; font-size:10px; text-align:right; color:var(--muted); }
 
-  /* ── TABS ── */
+  /* ══ TABS ══ */
   .tab-bar { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:16px; }
-  .tab-btn {
-    padding:8px 18px; border:none; background:none; font-size:11px; font-weight:700;
-    color:var(--muted); cursor:pointer; border-bottom:3px solid transparent;
-    margin-bottom:-2px; transition:all .2s;
-  }
-  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .tab-btn { padding:8px 18px; border:none; background:none; font-size:11px; font-weight:700; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
+  .tab-btn.active { color:var(--cyan); border-bottom-color:var(--cyan); }
+  .tab-btn:hover:not(.active) { color:var(--navy); }
   .tab-content { display:none; }
   .tab-content.active { display:block; }
 
-  /* ── INFO BOX ── */
+  /* ══ INFO BOXES ══ */
   .info-box {
-    background: #e3f2fd; border-left: 4px solid var(--mid-blue);
+    background: #E0EEFF; border-left: 4px solid var(--navy);
     border-radius: 0 6px 6px 0; padding: 10px 14px;
-    font-size: 10px; color: #1565c0; line-height: 1.6; margin-bottom: 16px;
+    font-size:10px; color:var(--navy); line-height:1.6; margin-bottom:16px;
   }
   .warn-box {
-    background: #fdecea; border-left: 4px solid var(--red);
+    background: var(--flame-lt); border-left: 4px solid var(--flame);
     border-radius: 0 6px 6px 0; padding: 10px 14px;
-    font-size: 10px; color: #a00000; line-height: 1.6; margin-bottom: 16px;
+    font-size:10px; color:#8a2c10; line-height:1.6; margin-bottom:16px;
   }
 
-  /* ── FOOTER ── */
-  footer {
-    text-align:center; font-size:10px; color:var(--muted);
-    padding:18px; border-top:1px solid var(--border);
-    background:#fff; margin-top:10px;
-  }
+  /* ══ FOOTER ══ */
+  footer { text-align:center; font-size:10px; color:var(--muted); padding:18px; border-top:1px solid var(--border); background:var(--surface); margin-top:10px; }
 
-  @media(max-width:1100px){
-    .kpi-grid { grid-template-columns:repeat(2,1fr); }
-    .bank-grid { grid-template-columns:repeat(2,1fr); }
-    .two-col { grid-template-columns:1fr; }
-  }
-  @media(max-width:700px){
-    .kpi-grid { grid-template-columns:1fr 1fr; }
-    .bank-grid { grid-template-columns:1fr 1fr; }
-    header { flex-direction:column; gap:10px; }
-  }
+  @media(max-width:1100px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .bank-grid{grid-template-columns:repeat(2,1fr);} .two-col{grid-template-columns:1fr;} }
+  @media(max-width:700px) { .kpi-grid{grid-template-columns:1fr 1fr;} header{flex-direction:column;gap:10px;} }
 </style>
 </head>
 <body>
@@ -295,17 +258,21 @@
 <!-- ══ HEADER ══ -->
 <header>
   <div>
-    <h1>📊 NPCI &amp; PSP Banks — CEO Engagement Dashboard</h1>
+    <h1>
+      <!-- Paytm-style logo mark using brand colors -->
+      <span style="color:var(--cyan)">pay</span><span style="color:#fff">tm</span>
+      &nbsp;|&nbsp; NPCI &amp; PSP Banks — CEO Dashboard
+    </h1>
     <div class="subtitle">
-      Paytm Payments | NPCI = Regulator &nbsp;·&nbsp; TPAP = Paytm App &nbsp;·&nbsp; PSP = Partner Banks (SBI, HDFC, YBL, Axis)
+      NPCI = Regulator &nbsp;·&nbsp; TPAP = Paytm App &nbsp;·&nbsp; PSP = Partner Banks (SBI, HDFC, YBL, Axis)
     </div>
   </div>
   <div class="nav-pills">
-    <a class="nav-pill reg"  href="#sec-npci">🏛 NPCI Regulatory</a>
-    <a class="nav-pill crit" href="#sec-crit">🔴 P0 Critical</a>
-    <a class="nav-pill psp"  href="#sec-psp">🏦 PSP Banks</a>
-    <a class="nav-pill tpap" href="#sec-tpap">📱 TPAP App</a>
-    <a class="nav-pill mkt"  href="#sec-mkt">📈 Market Data</a>
+    <a class="nav-pill np-reg"  href="#sec-npci">🏛 NPCI Regulatory</a>
+    <a class="nav-pill np-crit" href="#sec-crit">⚠ P0 Critical</a>
+    <a class="nav-pill np-psp"  href="#sec-psp">🏦 PSP Banks</a>
+    <a class="nav-pill np-tpap" href="#sec-tpap">📱 TPAP App</a>
+    <a class="nav-pill np-mkt"  href="#sec-mkt">📈 Market Data</a>
   </div>
 </header>
 
@@ -313,25 +280,22 @@
 
 <!-- ══ ATTENTION BANNER ══ -->
 <div class="attention-bar">
-  ⚠️ CEO ATTENTION REQUIRED &nbsp;—&nbsp;
-  <span class="pill">2 items aging &gt;1 Year with SBI (Invoicing)</span>
-  <span class="pill">126 P0 Critical items open</span>
-  <span class="pill">HDFC: 13 open items, oldest 6+ months</span>
+  ⚠️ &nbsp;CEO ATTENTION &nbsp;—&nbsp;
+  <span class="ab-pill">2 items aging &gt;1 Year at SBI (Invoicing, since May'24)</span>
+  <span class="ab-pill">126 P0 Critical items open</span>
+  <span class="ab-pill">HDFC: 13 open items, oldest 6+ months</span>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     KPI TILES + MINI CHARTS  (4 columns, paired)
-     Priority: Regulatory → Critical → PSP → TPAP
-═══════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     KPI TILES + PAIRED MINI CHARTS
+     Hierarchy: Regulatory → Critical → PSP → TPAP
+═══════════════════════════════════════════════ -->
 <div class="kpi-grid">
 
-  <!-- 1. NPCI — Regulator (HIGHEST CEO priority) -->
+  <!-- 1. NPCI Regulatory — Highest CEO priority -->
   <div class="kpi-col">
-    <a class="kpi-card kpi-reg" href="#sec-npci">
-      <div class="kpi-tag">
-        <span>🏛 NPCI</span>
-        <span class="entity-badge">REGULATOR</span>
-      </div>
+    <a class="kpi-card kk-navy" href="#sec-npci">
+      <div class="kpi-tag"><span>🏛 NPCI</span><span class="entity-badge">REGULATOR</span></div>
       <div class="kpi-title">Regulatory Open Items</div>
       <div class="kpi-value">28</div>
       <div class="kpi-sub">5 on hold &nbsp;·&nbsp; 3 due next month &nbsp;·&nbsp; 6 closed</div>
@@ -344,13 +308,10 @@
     </div>
   </div>
 
-  <!-- 2. P0 Critical (SECOND — immediate action) -->
+  <!-- 2. P0 Critical — Immediate action -->
   <div class="kpi-col">
-    <a class="kpi-card kpi-crit" href="#sec-crit">
-      <div class="kpi-tag">
-        <span>🔴 PRIORITY</span>
-        <span class="entity-badge">ACT NOW</span>
-      </div>
+    <a class="kpi-card kk-flame" href="#sec-crit">
+      <div class="kpi-tag"><span>⚠ PRIORITY</span><span class="entity-badge">ACT NOW</span></div>
       <div class="kpi-title">P0 Critical Items</div>
       <div class="kpi-value">126</div>
       <div class="kpi-sub">P1 High: 121 &nbsp;·&nbsp; P2 Medium: 16 &nbsp;·&nbsp; Total: 263</div>
@@ -358,18 +319,15 @@
       <div class="kpi-arrow">↓</div>
     </a>
     <div class="kpi-chart-box">
-      <div class="kpi-chart-label">Priority Distribution (263 total items)</div>
+      <div class="kpi-chart-label">Priority Distribution (263 total)</div>
       <div class="kpi-chart-wrap"><canvas id="c-pri"></canvas></div>
     </div>
   </div>
 
-  <!-- 3. PSP Banks (THIRD — partner bank blockers) -->
+  <!-- 3. PSP Banks — Partner blockers -->
   <div class="kpi-col">
-    <a class="kpi-card kpi-psp" href="#sec-psp">
-      <div class="kpi-tag">
-        <span>🏦 PSP BANKS</span>
-        <span class="entity-badge">PARTNERS</span>
-      </div>
+    <a class="kpi-card kk-amber" href="#sec-psp">
+      <div class="kpi-tag"><span>🏦 PSP BANKS</span><span class="entity-badge">PARTNERS</span></div>
       <div class="kpi-title">Bank Open Issues</div>
       <div class="kpi-value">25</div>
       <div class="kpi-sub">SBI 7 &nbsp;·&nbsp; HDFC 13 &nbsp;·&nbsp; YBL 3 &nbsp;·&nbsp; Axis 2</div>
@@ -382,13 +340,10 @@
     </div>
   </div>
 
-  <!-- 4. TPAP (Paytm App) tracker -->
+  <!-- 4. TPAP (Paytm App) -->
   <div class="kpi-col">
-    <a class="kpi-card kpi-tpap" href="#sec-tpap">
-      <div class="kpi-tag">
-        <span>📱 TPAP</span>
-        <span class="entity-badge">PAYTM APP</span>
-      </div>
+    <a class="kpi-card kk-cyan" href="#sec-tpap">
+      <div class="kpi-tag"><span>📱 TPAP</span><span class="entity-badge">PAYTM APP</span></div>
       <div class="kpi-title">App Tracker Items</div>
       <div class="kpi-value">154</div>
       <div class="kpi-sub">67 open &nbsp;·&nbsp; 59 closed &nbsp;·&nbsp; 21 on hold &nbsp;·&nbsp; 7 other</div>
@@ -404,11 +359,11 @@
 </div><!-- /kpi-grid -->
 
 
-<!-- ════════════════════════════════
-     SECTION 1: NPCI REGULATORY
-═══════════════════════════════════ -->
+<!-- ════════════════════════════
+     § 1  NPCI REGULATORY
+════════════════════════════ -->
 <div id="sec-npci">
-  <div class="section-header sh-reg">
+  <div class="section-header sh-navy">
     <span class="sh-icon">🏛</span>
     <div class="sh-text">
       <h2>NPCI — Regulatory Compliance Status</h2>
@@ -419,41 +374,40 @@
   <div class="section-body">
     <div class="section-inner">
       <div class="warn-box">
-        ⚠️ <strong>CEO Note:</strong> 28 items are open with NPCI (Regulator). Of these, 5 are on hold and 3 are due next month.
-        P0 items represent direct compliance obligations — delays carry regulatory risk.
+        ⚠️ <strong>CEO Note:</strong> 28 items are open with NPCI (Regulator). 5 are on hold and 3 are due next month. P0 items represent direct compliance obligations — delays carry regulatory risk.
       </div>
       <div class="tab-bar">
         <button class="tab-btn active" onclick="sw('npci-status','npci')">Status Breakdown</button>
-        <button class="tab-btn" onclick="sw('npci-module','npci')">By Module</button>
+        <button class="tab-btn" onclick="sw('npci-module','npci')">By Module / Category</button>
       </div>
+      <!-- Status tab -->
       <div id="tab-npci-status" class="tab-content active">
         <div class="stat-row">
-          <div class="stat-pill" style="background:#fdecea;color:#c00000;">● 28 Open</div>
-          <div class="stat-pill" style="background:#fff3e0;color:#ed7d31;">● 5 On Hold</div>
-          <div class="stat-pill" style="background:#e8f5e9;color:#2d7a2d;">● 6 Closed</div>
-          <div class="stat-pill" style="background:#fffde7;color:#c9a227;">● 3 Due Next Month</div>
-          <div class="stat-period">📅 NPCI Summary Tracker — 6th Feb 2026 &nbsp;|&nbsp; 42 total engagements</div>
+          <div class="stat-pill" style="background:var(--flame-lt);color:var(--flame);">● 28 Open</div>
+          <div class="stat-pill" style="background:var(--amber-lt);color:#c07a00;">● 5 On Hold</div>
+          <div class="stat-pill" style="background:var(--green-lt);color:#019050;">● 6 Closed</div>
+          <div class="stat-pill" style="background:var(--yellow-lt);color:#b06000;">● 3 Due Next Month</div>
+          <div class="stat-period">📅 NPCI Summary Tracker — 6th Feb 2026 &nbsp;|&nbsp; 42 total</div>
         </div>
         <table class="tbl-stripe">
-          <thead>
-            <tr><th>Status</th><th>Count</th><th>Share</th><th>Regulatory Impact</th></tr>
-          </thead>
+          <thead><tr><th>Status</th><th>Count</th><th>Share of 42</th><th>Regulatory Impact</th></tr></thead>
           <tbody>
             <tr><td><span class="badge b-open">Open</span></td><td><strong>28</strong></td>
-              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:66.7%;background:var(--red)"></div></div><span class="bar-pct">66.7%</span></div></td>
-              <td style="color:var(--red);font-weight:600;">⚡ Active regulatory items — direct compliance risk</td></tr>
+              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:66.7%;background:var(--flame)"></div></div><span class="bar-pct">66.7%</span></div></td>
+              <td style="color:var(--flame);font-weight:600;">⚠ Active items — direct compliance risk</td></tr>
             <tr><td><span class="badge b-hold">On Hold</span></td><td><strong>5</strong></td>
-              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:11.9%;background:var(--orange)"></div></div><span class="bar-pct">11.9%</span></div></td>
-              <td style="color:var(--orange);font-weight:600;">🔒 Blocked — escalation to NPCI needed</td></tr>
+              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:11.9%;background:var(--amber)"></div></div><span class="bar-pct">11.9%</span></div></td>
+              <td style="color:#c07a00;font-weight:600;">🔒 Blocked — escalation to NPCI needed</td></tr>
             <tr><td><span class="badge b-due">Due Next Month</span></td><td><strong>3</strong></td>
-              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:7.1%;background:var(--gold)"></div></div><span class="bar-pct">7.1%</span></div></td>
-              <td style="color:var(--gold);font-weight:600;">📅 Upcoming deadlines — monitor weekly</td></tr>
+              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:7.1%;background:var(--yellow)"></div></div><span class="bar-pct">7.1%</span></div></td>
+              <td style="color:#b06000;font-weight:600;">📅 Upcoming deadlines — monitor weekly</td></tr>
             <tr><td><span class="badge b-closed">Closed</span></td><td><strong>6</strong></td>
               <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:14.3%;background:var(--green)"></div></div><span class="bar-pct">14.3%</span></div></td>
-              <td style="color:var(--green);font-weight:600;">✅ Resolved & compliant</td></tr>
+              <td style="color:#019050;font-weight:600;">✅ Resolved &amp; compliant</td></tr>
           </tbody>
         </table>
       </div>
+      <!-- Module tab -->
       <div id="tab-npci-module" class="tab-content">
         <table class="tbl-stripe">
           <thead><tr><th>Module / Category</th><th>Item Count</th><th>Notes</th></tr></thead>
@@ -463,9 +417,9 @@
             <tr><td>New Features — Issuing</td><td>6</td><td>Feature readiness required by regulator</td></tr>
             <tr><td>New Features — GFF</td><td>6</td><td>Government financial features</td></tr>
             <tr><td>BAU Issues — Autopay</td><td>6</td><td>Autopay mandate compliance</td></tr>
-            <tr><td>Spoofing</td><td>4</td><td>Security — regulator-mandated RCA</td></tr>
-            <tr><td>Circular Compliance</td><td>3</td><td>Regulatory circular implementation</td></tr>
+            <tr><td>Spoofing (Security)</td><td>4</td><td>Regulator-mandated RCA submission</td></tr>
             <tr><td>Proposals to NPCI</td><td>4</td><td>Paytm proposals pending NPCI approval</td></tr>
+            <tr><td>Circular Compliance</td><td>3</td><td>Regulatory circular implementation</td></tr>
             <tr><td>Others</td><td>10</td><td>Reporting, Mapper, PCOMP, Audit etc.</td></tr>
           </tbody>
         </table>
@@ -475,55 +429,62 @@
 </div>
 
 
-<!-- ════════════════════════════════
-     SECTION 2: P0 CRITICAL
-═══════════════════════════════════ -->
+<!-- ════════════════════════════
+     § 2  P0 CRITICAL
+════════════════════════════ -->
 <div id="sec-crit">
-  <div class="section-header sh-crit">
-    <span class="sh-icon">🔴</span>
+  <div class="section-header sh-flame">
+    <span class="sh-icon">⚠</span>
     <div class="sh-text">
-      <h2>P0 Critical Items — Needs CEO Action</h2>
+      <h2>P0 Critical Items — CEO Action Required</h2>
       <div class="sh-sub">Highest priority items across NPCI + TPAP trackers requiring immediate escalation or decision</div>
     </div>
-    <div class="sh-meta">📅 TPAP Tracker: 29th Aug 2025 &nbsp;|&nbsp; NPCI: 6th Feb 2026</div>
+    <div class="sh-meta">📅 TPAP: 29th Aug 2025 &nbsp;|&nbsp; NPCI: 6th Feb 2026</div>
   </div>
   <div class="section-body">
     <div class="section-inner">
       <div class="stat-row">
-        <div class="stat-pill" style="background:#fdecea;color:#c00000;">🔴 P0: 126 items</div>
-        <div class="stat-pill" style="background:#fff3e0;color:#ed7d31;">🟠 P1: 121 items</div>
-        <div class="stat-pill" style="background:#fffde7;color:#c9a227;">🟡 P2: 16 items</div>
-        <div class="stat-pill" style="background:#f0f0f0;color:#595959;">⚪ Unassigned: 6</div>
+        <div class="stat-pill" style="background:var(--flame-lt);color:var(--flame);">⚠ P0: 126 items</div>
+        <div class="stat-pill" style="background:var(--amber-lt);color:#c07a00;">● P1: 121 items</div>
+        <div class="stat-pill" style="background:var(--yellow-lt);color:#b06000;">● P2: 16 items</div>
+        <div class="stat-pill" style="background:var(--gray-lt);color:var(--muted);">● Unassigned: 6</div>
         <div class="stat-period">263 total items across NPCI + TPAP trackers</div>
       </div>
       <table class="tbl-stripe">
         <thead>
-          <tr><th>Priority</th><th>NPCI Tracker<br/><span style="font-weight:400;font-size:9px">(6th Feb 2026)</span></th><th>TPAP Tracker<br/><span style="font-weight:400;font-size:9px">(29th Aug 2025)</span></th><th>Combined</th><th>Urgency</th></tr>
+          <tr>
+            <th>Priority</th>
+            <th>NPCI Tracker<br/><span style="font-weight:400;font-size:9px">(6th Feb 2026)</span></th>
+            <th>TPAP Tracker<br/><span style="font-weight:400;font-size:9px">(29th Aug 2025)</span></th>
+            <th>Combined</th>
+            <th>Urgency Level</th>
+          </tr>
         </thead>
         <tbody>
-          <tr style="background:#fff5f5">
+          <tr style="background:var(--flame-lt)">
             <td><span class="badge b-p0">P0 — Critical</span></td>
-            <td><strong>31</strong></td><td><strong>95</strong></td><td><strong style="color:var(--red);font-size:14px">126</strong></td>
-            <td style="color:var(--red);font-weight:700">🔴 CEO Visibility — Mission Critical</td>
+            <td><strong>31</strong></td><td><strong>95</strong></td>
+            <td><strong style="color:var(--flame);font-size:14px">126</strong></td>
+            <td style="color:var(--flame);font-weight:700">⚠ CEO Visibility — Mission Critical</td>
           </tr>
           <tr>
             <td><span class="badge b-p1">P1 — High</span></td>
             <td>60</td><td>61</td><td><strong>121</strong></td>
-            <td style="color:var(--orange);font-weight:600">🟠 Weekly review required</td>
+            <td style="color:#c07a00;font-weight:600">● Weekly review required</td>
           </tr>
           <tr>
             <td><span class="badge b-p2">P2 — Medium</span></td>
             <td>7</td><td>9</td><td><strong>16</strong></td>
-            <td style="color:var(--gold);font-weight:600">🟡 Monthly tracking sufficient</td>
+            <td style="color:#b06000;font-weight:600">● Monthly tracking sufficient</td>
           </tr>
           <tr>
-            <td><span class="badge" style="background:#f0f0f0;color:#595959;border:1px solid #ccc">Unassigned</span></td>
+            <td><span class="badge" style="background:var(--gray-lt);color:var(--muted);border:1px solid var(--border)">Unassigned</span></td>
             <td>0</td><td>6</td><td><strong>6</strong></td>
             <td style="color:var(--muted)">Needs prioritization</td>
           </tr>
-          <tr style="background:#eef2ff">
+          <tr style="background:var(--blue-lt)">
             <td><strong>TOTAL</strong></td>
-            <td><strong>98</strong></td><td><strong>171</strong></td><td><strong>263</strong></td><td></td>
+            <td><strong>98</strong></td><td><strong>165</strong></td><td><strong>263</strong></td><td></td>
           </tr>
         </tbody>
       </table>
@@ -532,91 +493,108 @@
 </div>
 
 
-<!-- ════════════════════════════════
-     SECTION 3: PSP BANKS
-═══════════════════════════════════ -->
+<!-- ════════════════════════════
+     § 3  PSP BANKS
+════════════════════════════ -->
 <div id="sec-psp">
-  <div class="section-header sh-psp">
+  <div class="section-header sh-amber">
     <span class="sh-icon">🏦</span>
     <div class="sh-text">
       <h2>PSP Banks — Open Issues</h2>
-      <div class="sh-sub">PSP banks (SBI, HDFC, YBL, Axis) are Paytm's partner banks. Issues here block product features &amp; compliance.</div>
+      <div class="sh-sub">PSP banks are Paytm's partner banks. Issues here block product features, compliance signoffs &amp; revenue invoicing.</div>
     </div>
     <div class="sh-meta">📅 As of Feb 2026</div>
   </div>
   <div class="section-body">
     <div class="section-inner">
       <div class="info-box">
-        ℹ️ <strong>Context:</strong> PSP (Payment Service Provider) banks are the banking partners through which Paytm's UPI handles
-        (ptsbi, pthdfc, ptybl, ptaxis) operate. Open issues at banks directly block customer features,
-        compliance signoffs, and revenue invoicing.
+        ℹ️ <strong>Context:</strong> PSP (Payment Service Provider) banks host Paytm's UPI handles (ptsbi, pthdfc, ptybl, ptaxis). Open issues at banks directly block customer features, compliance signoffs and revenue invoicing.
       </div>
-
-      <!-- Bank cards -->
       <div class="bank-grid">
         <div class="bank-card sbi" onclick="document.getElementById('sbi-detail').scrollIntoView({behavior:'smooth'})">
           <div class="bc-entity">PSP Bank</div>
-          <div class="bc-name" style="color:var(--red)">SBI</div>
-          <div class="bc-count" style="color:var(--red)">7</div>
+          <div class="bc-name" style="color:var(--flame)">SBI</div>
+          <div class="bc-count" style="color:var(--flame)">7</div>
           <div class="bc-label">Open Items</div>
-          <div class="bc-detail">
-            <span class="badge b-p0">P0</span><br/>
-            OC215 check status, UDIR callback,<br/>Invoicing recon, NTSL/GST files
-          </div>
+          <div class="bc-detail"><span class="badge b-p0">P0</span><br/>OC215, UDIR callback, Invoicing recon, NTSL/GST files</div>
           <div class="bc-period">⏱ Oldest: <strong>&gt;1 Year</strong> (Invoicing — May'24)</div>
-          <div style="font-size:10px;color:var(--red);margin-top:8px;font-weight:700">⬇ Click for details</div>
+          <div style="font-size:10px;color:var(--cyan);margin-top:8px;font-weight:700">↓ Click for details</div>
         </div>
         <div class="bank-card hdfc">
           <div class="bc-entity">PSP Bank</div>
-          <div class="bc-name" style="color:var(--orange)">HDFC</div>
-          <div class="bc-count" style="color:var(--orange)">13</div>
+          <div class="bc-name" style="color:var(--amber)">HDFC</div>
+          <div class="bc-count" style="color:var(--amber)">13</div>
           <div class="bc-label">Open Items</div>
-          <div class="bc-detail">
-            <span class="badge b-p0">P0</span><br/>
-            UDIR callback, Profile sync,<br/>Recon (URCS), NRE/NRO
-          </div>
+          <div class="bc-detail"><span class="badge b-p0">P0</span><br/>UDIR callback, Profile sync, Recon (URCS), OC215</div>
           <div class="bc-period">⏱ Oldest: <strong>&gt;6 Months</strong> (UDIR — Jul'25)</div>
         </div>
         <div class="bank-card ybl">
           <div class="bc-entity">PSP Bank</div>
-          <div class="bc-name" style="color:var(--gold)">Yes Bank (YBL)</div>
-          <div class="bc-count" style="color:var(--gold)">3</div>
+          <div class="bc-name" style="color:var(--blue)">Yes Bank (YBL)</div>
+          <div class="bc-count" style="color:var(--blue)">3</div>
           <div class="bc-label">Open Items</div>
-          <div class="bc-detail">
-            <span class="badge b-p1">P1</span><br/>
-            URCS access, Device binding,<br/>Payer PSP &amp; TPAP fee invoice
-          </div>
+          <div class="bc-detail"><span class="badge b-p1">P1</span><br/>URCS access, Device binding, Payer PSP &amp; TPAP fee</div>
           <div class="bc-period">⏱ Oldest: <strong>&gt;8 Months</strong> (URCS — May'25)</div>
         </div>
         <div class="bank-card axis">
           <div class="bc-entity">PSP Bank</div>
-          <div class="bc-name" style="color:var(--mid-blue)">Axis Bank</div>
-          <div class="bc-count" style="color:var(--mid-blue)">2</div>
+          <div class="bc-name" style="color:var(--blue)">Axis Bank</div>
+          <div class="bc-count" style="color:var(--blue)">2</div>
           <div class="bc-label">Open Items</div>
-          <div class="bc-detail">
-            <span class="badge b-p1">P1</span><br/>
-            Device binding token SMS,<br/>NRE/NRO implementation
-          </div>
+          <div class="bc-detail"><span class="badge b-p1">P1</span><br/>Device binding token SMS, NRE/NRO implementation</div>
           <div class="bc-period">⏱ Oldest: <strong>&gt;7 Months</strong> (Jun'25)</div>
         </div>
       </div>
 
-      <!-- SBI Detail Table -->
-      <div id="sbi-detail" style="font-size:11px;font-weight:800;color:var(--dark-blue);text-transform:uppercase;letter-spacing:.6px;margin:6px 0 10px;padding-top:8px;border-top:2px solid var(--border);">
-        SBI — Item-Level Detail (Latest Status: 18th Feb 2026)
+      <!-- SBI Detail -->
+      <div id="sbi-detail" style="font-size:11px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.6px;margin:4px 0 10px;padding-top:12px;border-top:2px solid var(--border);">
+        SBI — Item-Level Detail &nbsp;<span style="color:var(--muted);font-weight:400;font-size:10px">(Latest Status: 18th Feb 2026)</span>
       </div>
       <table>
-        <thead>
-          <tr><th>#</th><th>Feature / Issue</th><th>Current Status — Feb'26</th><th>Pending At</th><th>SPOC</th><th>Aging</th></tr>
-        </thead>
+        <thead><tr><th>#</th><th>Feature / Issue</th><th>Current Status (Feb'26)</th><th>Pending At</th><th>SPOC</th><th>Aging</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>OC 215 Check Status</td><td>ETA awaited for Prod deployment. Sanity signoff shared 28th Jan.</td><td>SBI</td><td>Himanshu/Vikas</td><td><span class="aging"><span class="dot dot-o"></span>&gt; 3 Months</span></td></tr>
-          <tr><td>2</td><td>Alternate Device Binding — Reverse SMS</td><td>Feature to be prioritized. Joint call to be scheduled with tech.</td><td>SBI</td><td>Aravind</td><td><span class="aging"><span class="dot dot-o"></span>&gt; 2 Months</span></td></tr>
-          <tr><td>3</td><td>Alternate Device Binding — SMV</td><td>Feature prioritization + ETA awaited.</td><td>SBI</td><td>Aravind</td><td><span class="aging"><span class="dot dot-o"></span>&gt; 2 Months</span></td></tr>
-          <tr style="background:#fff5f5"><td>4</td><td>UDIR Callback for Refund (OC165)</td><td>URL config at Bank awaited. Testing blocked at SBI/MGS end.</td><td>SBI/MGS</td><td>Rohan</td><td><span class="aging"><span class="dot dot-r"></span><strong style="color:var(--red)">&gt; 5 Months</strong></span></td></tr>
-          <tr style="background:#fff5f5"><td>5</td><td>Invoicing — Incentive</td><td>Aug'25–Jan'26 computation in progress. Files expected March first week.</td><td>SBI</td><td>Aravind</td><td><span class="aging"><span class="dot dot-r"></span><strong style="color:var(--red)">&gt; 1 Year (May'24)</strong></span></td></tr>
-          <tr style="background:#fff5f5"><td>6</td><td>NTSL &amp; GST Files — ptsbi handle</td><td>Files for FY'24–25 &amp; Oct, Dec'25 awaited from SBI/NPCI.</td><td>SBI/NPCI</td><td>Aravind</td><td><span class="aging"><span class="dot dot-r"></span><strong style="color:var(--red)">&gt; 1 Year (May'24)</strong></span></td></tr>
-          <tr style="background:#f0fff4"><td>7</td><td>Autopay Interoperability</td><td>In Dev at Paytm. Clarifications received 3rd Feb. Testing pending.</td><td>Paytm</td><td>Mithun</td><td><span class="aging"><span class="dot dot-g"></span>&lt; 1 Month</span></td></tr>
+          <tr>
+            <td>1</td><td>OC 215 Check Status</td>
+            <td>ETA awaited for Prod deployment. Sanity signoff shared 28th Jan.</td>
+            <td>SBI</td><td>Himanshu/Vikas</td>
+            <td><span class="aging"><span class="dot dot-o"></span>&gt; 3 Months</span></td>
+          </tr>
+          <tr>
+            <td>2</td><td>Alternate Device Binding — Reverse SMS</td>
+            <td>Feature prioritization + ETA awaited. Joint call to be scheduled.</td>
+            <td>SBI</td><td>Aravind</td>
+            <td><span class="aging"><span class="dot dot-o"></span>&gt; 2 Months</span></td>
+          </tr>
+          <tr>
+            <td>3</td><td>Alternate Device Binding — SMV</td>
+            <td>Feature prioritization + ETA awaited.</td>
+            <td>SBI</td><td>Aravind</td>
+            <td><span class="aging"><span class="dot dot-o"></span>&gt; 2 Months</span></td>
+          </tr>
+          <tr style="background:var(--flame-lt)">
+            <td>4</td><td>UDIR Callback for Refund (OC165)</td>
+            <td>URL config at Bank awaited. Testing blocked at SBI/MGS.</td>
+            <td>SBI/MGS</td><td>Rohan</td>
+            <td><span class="aging"><span class="dot dot-r"></span><strong style="color:var(--flame)">&gt; 5 Months</strong></span></td>
+          </tr>
+          <tr style="background:var(--flame-lt)">
+            <td>5</td><td>Invoicing — Incentive</td>
+            <td>Aug'25–Jan'26 computation in progress. Files expected March first week.</td>
+            <td>SBI</td><td>Aravind</td>
+            <td><span class="aging"><span class="dot dot-r"></span><strong style="color:var(--flame)">&gt; 1 Year (May'24)</strong></span></td>
+          </tr>
+          <tr style="background:var(--flame-lt)">
+            <td>6</td><td>NTSL &amp; GST Files — ptsbi handle</td>
+            <td>Files for FY'24–25 &amp; Oct, Dec'25 awaited from SBI/NPCI.</td>
+            <td>SBI/NPCI</td><td>Aravind</td>
+            <td><span class="aging"><span class="dot dot-r"></span><strong style="color:var(--flame)">&gt; 1 Year (May'24)</strong></span></td>
+          </tr>
+          <tr style="background:var(--green-lt)">
+            <td>7</td><td>Autopay Interoperability</td>
+            <td>In Dev at Paytm. Clarifications received 3rd Feb. Testing pending.</td>
+            <td>Paytm</td><td>Mithun</td>
+            <td><span class="aging"><span class="dot dot-g"></span>&lt; 1 Month</span></td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -624,53 +602,51 @@
 </div>
 
 
-<!-- ════════════════════════════════
-     SECTION 4: TPAP (Paytm App)
-═══════════════════════════════════ -->
+<!-- ════════════════════════════
+     § 4  TPAP (Paytm App)
+════════════════════════════ -->
 <div id="sec-tpap">
-  <div class="section-header sh-tpap">
+  <div class="section-header sh-cyan">
     <span class="sh-icon">📱</span>
     <div class="sh-text">
       <h2>TPAP — Paytm App Tracker</h2>
-      <div class="sh-sub">TPAP (The Paytm App) feature &amp; compliance items tracked with NPCI. 154 items across all priority levels.</div>
+      <div class="sh-sub">TPAP (The Paytm App) feature &amp; compliance items tracked jointly with NPCI. 154 items across all priority levels.</div>
     </div>
     <div class="sh-meta">📅 As of 29th Aug 2025</div>
   </div>
   <div class="section-body">
     <div class="section-inner">
       <div class="info-box">
-        ℹ️ <strong>Context:</strong> TPAP is the Paytm consumer UPI app. These are items being tracked jointly with NPCI covering
-        compliance, new feature readiness, BAU issues, and circular implementation.
-        The tracker was last updated 29th Aug 2025 — some items may now be resolved.
+        ℹ️ <strong>Context:</strong> TPAP is the Paytm consumer UPI app. These items cover compliance, new feature readiness, BAU issues, and circular implementation tracked jointly with NPCI. Tracker last updated 29th Aug 2025.
       </div>
       <div class="two-col">
         <div>
           <div class="stat-row">
-            <div class="stat-pill" style="background:#fdecea;color:#c00000;">● 67 Open</div>
-            <div class="stat-pill" style="background:#fff3e0;color:#ed7d31;">● 21 On Hold</div>
-            <div class="stat-pill" style="background:#e8f5e9;color:#2d7a2d;">● 59 Closed</div>
-            <div class="stat-pill" style="background:#fffde7;color:#c9a227;">● 7 Other</div>
+            <div class="stat-pill" style="background:var(--flame-lt);color:var(--flame);">● 67 Open</div>
+            <div class="stat-pill" style="background:var(--amber-lt);color:#c07a00;">● 21 On Hold</div>
+            <div class="stat-pill" style="background:var(--green-lt);color:#019050;">● 59 Closed</div>
+            <div class="stat-pill" style="background:var(--yellow-lt);color:#b06000;">● 7 Other</div>
           </div>
           <table class="tbl-stripe">
             <thead><tr><th>Status</th><th>Count</th><th>% of 154</th><th>Implication</th></tr></thead>
             <tbody>
               <tr><td><span class="badge b-open">Open</span></td><td><strong>67</strong></td>
-                <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:43.5%;background:var(--red)"></div></div><span class="bar-pct">43.5%</span></div></td>
-                <td style="color:var(--red);font-weight:600">Active compliance/feature items</td></tr>
+                <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:43.5%;background:var(--flame)"></div></div><span class="bar-pct">43.5%</span></div></td>
+                <td style="color:var(--flame);font-weight:600">Active compliance / feature items</td></tr>
               <tr><td><span class="badge b-hold">On Hold</span></td><td><strong>21</strong></td>
-                <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:13.6%;background:var(--orange)"></div></div><span class="bar-pct">13.6%</span></div></td>
-                <td style="color:var(--orange);font-weight:600">Blocked — typically at PSP bank or NPCI</td></tr>
+                <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:13.6%;background:var(--amber)"></div></div><span class="bar-pct">13.6%</span></div></td>
+                <td style="color:#c07a00;font-weight:600">Blocked — typically at PSP bank or NPCI</td></tr>
               <tr><td><span class="badge b-closed">Closed</span></td><td><strong>59</strong></td>
                 <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:38.3%;background:var(--green)"></div></div><span class="bar-pct">38.3%</span></div></td>
-                <td style="color:var(--green);font-weight:600">Resolved</td></tr>
+                <td style="color:#019050;font-weight:600">Resolved</td></tr>
               <tr><td><span class="badge b-due">TBD / Not Due Yet</span></td><td><strong>7</strong></td>
-                <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:4.5%;background:var(--gold)"></div></div><span class="bar-pct">4.5%</span></div></td>
-                <td style="color:var(--gold);font-weight:600">Planned items — not yet actioned</td></tr>
+                <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:4.5%;background:var(--yellow)"></div></div><span class="bar-pct">4.5%</span></div></td>
+                <td style="color:#b06000;font-weight:600">Planned — not yet actioned</td></tr>
             </tbody>
           </table>
         </div>
         <div class="chart-panel">
-          <div class="cp-title">TPAP Closure Rate Over Time (Illustrative)</div>
+          <div class="cp-title">TPAP — Open vs Closed Trend (Illustrative)</div>
           <div class="cp-wrap"><canvas id="c-tpap2"></canvas></div>
         </div>
       </div>
@@ -679,50 +655,47 @@
 </div>
 
 
-<!-- ════════════════════════════════
-     SECTION 5: MARKET DATA
-═══════════════════════════════════ -->
+<!-- ════════════════════════════
+     § 5  MARKET DATA
+════════════════════════════ -->
 <div id="sec-mkt">
-  <div class="section-header sh-mkt">
+  <div class="section-header sh-blue">
     <span class="sh-icon">📈</span>
     <div class="sh-text">
       <h2>UPI Market Data — Ecosystem Trends</h2>
-      <div class="sh-sub">CC on UPI, UPI Lite, and App-wise market share. Paytm's competitive position in the UPI ecosystem.</div>
+      <div class="sh-sub">CC on UPI, UPI Lite, and App-wise UPI market share. Paytm's competitive position in the ecosystem.</div>
     </div>
-    <div class="sh-meta">📅 Data: Apr–Nov 2025</div>
+    <div class="sh-meta">📅 Apr–Nov 2025</div>
   </div>
   <div class="section-body">
     <div class="section-inner">
       <div class="two-col">
-        <!-- CC on UPI chart -->
         <div>
           <div class="cp-title" style="margin-bottom:10px">CC on UPI — Monthly Txn Volume (Apr–Aug 2025)</div>
-          <div class="cp-wrap" style="height:180px"><canvas id="c-cc"></canvas></div>
+          <div style="position:relative;height:170px"><canvas id="c-cc"></canvas></div>
           <table style="margin-top:14px" class="tbl-stripe">
-            <thead><tr><th>Month</th><th>Txn Count (Mn)</th><th>Txn Value (Cr)</th><th>MoM Change</th></tr></thead>
+            <thead><tr><th>Month</th><th>Txn Count (Mn)</th><th>Value (Cr)</th><th>MoM</th></tr></thead>
             <tbody>
               <tr><td>Apr'25</td><td>187</td><td>16,472</td><td>—</td></tr>
-              <tr><td>May'25</td><td>205</td><td>19,000</td><td style="color:var(--green)">▲ +9.6%</td></tr>
-              <tr><td>Jun'25</td><td>200</td><td>18,500</td><td style="color:var(--red)">▼ −2.4%</td></tr>
-              <tr><td>Jul'25</td><td>205</td><td>19,238</td><td style="color:var(--green)">▲ +2.5%</td></tr>
-              <tr style="background:#e3f5ff"><td><strong>Aug'25</strong></td><td><strong>230</strong></td><td><strong>22,270</strong></td><td style="color:var(--green);font-weight:700">▲ +12.2%</td></tr>
+              <tr><td>May'25</td><td>205</td><td>19,000</td><td style="color:var(--green);font-weight:700">▲ +9.6%</td></tr>
+              <tr><td>Jun'25</td><td>200</td><td>18,500</td><td style="color:var(--flame);font-weight:700">▼ −2.4%</td></tr>
+              <tr><td>Jul'25</td><td>205</td><td>19,238</td><td style="color:var(--green);font-weight:700">▲ +2.5%</td></tr>
+              <tr style="background:var(--blue-lt)"><td><strong>Aug'25</strong></td><td><strong>230</strong></td><td><strong>22,270</strong></td><td style="color:var(--green);font-weight:800">▲ +12.2%</td></tr>
             </tbody>
           </table>
-          <!-- UPI Lite -->
-          <div class="cp-title" style="margin-top:18px;margin-bottom:10px">UPI Lite — Monthly Volume (Apr–Jul 2025)</div>
+          <div class="cp-title" style="margin-top:18px;margin-bottom:8px">UPI Lite — Apr–Jul 2025</div>
           <table class="tbl-stripe">
             <thead><tr><th>Month</th><th>Volume (Mn)</th><th>Value (Cr)</th><th>MAU (Mn)</th></tr></thead>
             <tbody>
               <tr><td>Apr'25</td><td>77</td><td>890</td><td>4.8</td></tr>
               <tr><td>May'25</td><td>80</td><td>1,040</td><td>4.6</td></tr>
               <tr><td>Jun'25</td><td>80</td><td>1,102</td><td>4.4</td></tr>
-              <tr style="background:#e3f5ff"><td><strong>Jul'25</strong></td><td><strong>89</strong></td><td><strong>1,250</strong></td><td><strong>4.7</strong></td></tr>
+              <tr style="background:var(--blue-lt)"><td><strong>Jul'25</strong></td><td><strong>89</strong></td><td><strong>1,250</strong></td><td><strong>4.7</strong></td></tr>
             </tbody>
           </table>
         </div>
-        <!-- Ecosystem market share -->
         <div>
-          <div class="cp-title" style="margin-bottom:12px">App-wise UPI Market Share — Nov 2025 (Volume)</div>
+          <div class="cp-title" style="margin-bottom:12px">App-wise UPI Volume — Nov 2025 (Market Share)</div>
           <div id="ecoList"></div>
         </div>
       </div>
@@ -731,11 +704,11 @@
 </div>
 
 
-<!-- ════════════════════════════════
-     SECTION 6: MEITY INCENTIVES
-═══════════════════════════════════ -->
+<!-- ════════════════════════════
+     § 6  MEITY INCENTIVES
+════════════════════════════ -->
 <div id="sec-fin">
-  <div class="section-header sh-fin">
+  <div class="section-header sh-green">
     <span class="sh-icon">💰</span>
     <div class="sh-text">
       <h2>Meity Incentive — PSP Bank Wise Invoice Status</h2>
@@ -751,32 +724,24 @@
         </thead>
         <tbody>
           <tr>
-            <td><strong>HDFC</strong></td>
-            <td style="color:var(--orange)">Pending (GST clarity)</td>
-            <td>₹34.39 L</td><td>₹2.29 Cr</td>
-            <td>30% (PSP) &nbsp;/&nbsp; 100% (TPAP)</td>
-            <td><span style="color:var(--orange)">🟠</span> Invoice pending — GST applicability from HDFC awaited</td>
+            <td><strong>HDFC</strong></td><td style="color:#c07a00">Pending (GST clarity)</td>
+            <td>₹34.39 L</td><td>₹2.29 Cr</td><td>30% / 100%</td>
+            <td><span style="color:var(--amber)">●</span> Invoice pending — GST applicability from HDFC awaited</td>
           </tr>
           <tr>
-            <td><strong>Yes Bank</strong></td>
-            <td>₹51.72 Cr</td>
-            <td>₹3.49 Cr</td><td>₹6.98 Cr</td>
-            <td>85% share (all categories)</td>
-            <td><span style="color:var(--gold)">🟡</span> Invoice shared. <strong>Awaiting payment.</strong></td>
+            <td><strong>Yes Bank</strong></td><td>₹51.72 Cr</td>
+            <td>₹3.49 Cr</td><td>₹6.98 Cr</td><td>85% share</td>
+            <td><span style="color:var(--amber)">●</span> Invoice shared. <strong>Awaiting payment.</strong></td>
           </tr>
           <tr>
-            <td><strong>Axis Bank</strong></td>
-            <td>—</td>
-            <td>₹45.72 L</td><td>₹3.05 Cr</td>
-            <td>30% (PSP) &nbsp;/&nbsp; 100% (TPAP)</td>
-            <td><span style="color:var(--green)">🟢</span> Invoice shared. <strong>Payment completed.</strong></td>
+            <td><strong>Axis Bank</strong></td><td>—</td>
+            <td>₹45.72 L</td><td>₹3.05 Cr</td><td>30% / 100%</td>
+            <td><span style="color:var(--green)">●</span> Invoice shared. <strong>Payment completed.</strong></td>
           </tr>
           <tr>
-            <td><strong>SBI</strong></td>
-            <td>—</td>
-            <td>—</td><td>₹2.94 Cr</td>
-            <td>100%</td>
-            <td><span style="color:var(--gold)">🟡</span> Q1–Q3 paid. Q4 invoice pending.</td>
+            <td><strong>SBI</strong></td><td>—</td><td>—</td>
+            <td>₹2.94 Cr</td><td>100%</td>
+            <td><span style="color:var(--amber)">●</span> Q1–Q3 paid. Q4 invoice pending.</td>
           </tr>
         </tbody>
       </table>
@@ -788,118 +753,118 @@
 
 <footer>
   🔒 Confidential — Internal Use Only &nbsp;|&nbsp; Paytm Payments Bank Limited &nbsp;|&nbsp;
-  NPCI = National Payments Corporation of India (Regulator) &nbsp;·&nbsp;
-  TPAP = The Paytm App (UPI Consumer App) &nbsp;·&nbsp;
-  PSP = Payment Service Provider Banks &nbsp;|&nbsp;
-  Dashboard as of March 2026
+  NPCI = Regulator &nbsp;·&nbsp; TPAP = Paytm App &nbsp;·&nbsp; PSP = Partner Banks &nbsp;|&nbsp;
+  Brand colors sourced from Paytm official palette (#002E6E · #00B9F1) &nbsp;|&nbsp; March 2026
 </footer>
 
 <script>
-// ── Tab switcher ──
+// Tab switch
 function sw(id, group) {
   document.querySelectorAll(`[id^="tab-${group}-"]`).forEach(t => t.classList.remove('active'));
-  document.querySelectorAll(`[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
-  event.target.classList.add('active');
   event.target.closest('.tab-bar').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
 }
 
-// ── Chart defaults ──
-Chart.defaults.font.family = 'Arial, sans-serif';
-Chart.defaults.font.size   = 10;
-Chart.defaults.color       = '#595959';
-const tooltip = {
-  backgroundColor: '#1F3864',
-  titleColor: '#fff',
-  bodyColor: '#cdd8f0',
-  padding: 10,
-  cornerRadius: 6,
+// Paytm brand color palette for charts
+const C = {
+  navy:    '#002E6E',
+  cyan:    '#00B9F1',
+  blue:    '#0481C0',
+  blueLt:  '#C6DAE6',
+  green:   '#04DB7C',
+  greenLt: '#D4F7EA',
+  flame:   '#EF4E28',
+  flameLt: '#FDEEE9',
+  amber:   '#F5A623',
+  amberLt: '#FEF3DC',
+  yellow:  '#FCC47A',
+  muted:   '#5A7A9A',
+  gray:    '#A0B8CC',
 };
 
-// ── 1. NPCI Status (donut) ──
+Chart.defaults.font.family = 'Arial, sans-serif';
+Chart.defaults.font.size   = 10;
+Chart.defaults.color       = C.muted;
+
+const tip = { backgroundColor: C.navy, titleColor:'#fff', bodyColor:'#87bde0', padding:10, cornerRadius:6 };
+
+// ── 1. NPCI donut ──
 new Chart(document.getElementById('c-npci'), {
   type: 'doughnut',
   data: {
     labels: ['Open (28)', 'On Hold (5)', 'Due Next Mo. (3)', 'Closed (6)'],
-    datasets: [{ data: [28,5,3,6],
-      backgroundColor: ['#C00000','#ED7D31','#C9A227','#70AD47'],
+    datasets: [{ data:[28,5,3,6],
+      backgroundColor:[C.flame, C.amber, C.yellow, C.green],
       borderColor:'#fff', borderWidth:3, hoverOffset:5 }]
   },
   options: {
     responsive:true, maintainAspectRatio:false, cutout:'65%',
-    plugins: { legend:{position:'bottom', labels:{boxWidth:10,padding:7,font:{size:9}}}, tooltip:{plugins:{tooltip}} }
+    plugins:{ legend:{position:'bottom', labels:{boxWidth:10, padding:7, font:{size:9}}}, tooltip:{callbacks:{ label: ctx => ` ${ctx.label}: ${Math.round(ctx.raw/42*100)}%` }, ...tip} }
   }
 });
 
-// ── 2. Priority Bar ──
+// ── 2. Priority bar ──
 new Chart(document.getElementById('c-pri'), {
   type: 'bar',
   data: {
-    labels: ['P0', 'P1', 'P2', 'N/A'],
-    datasets: [{ data:[126,121,16,6],
-      backgroundColor:['#C00000','#ED7D31','#C9A227','#A6A6A6'],
+    labels:['P0','P1','P2','N/A'],
+    datasets:[{ data:[126,121,16,6],
+      backgroundColor:[C.flame, C.amber, C.yellow, C.gray],
       borderRadius:5, borderSkipped:false }]
   },
   options: {
     responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{display:false}, tooltip:{plugins:{tooltip}} },
-    scales:{ x:{grid:{display:false}}, y:{grid:{color:'#f0f0f0'}} }
+    plugins:{ legend:{display:false}, tooltip:tip },
+    scales:{ x:{grid:{display:false}}, y:{grid:{color:'#E0EEF8'}} }
   }
 });
 
-// ── 3. PSP Bank Bar ──
+// ── 3. PSP Bank horizontal bar ──
 new Chart(document.getElementById('c-psp'), {
   type: 'bar',
   data: {
-    labels: ['SBI','HDFC','YBL','Axis'],
-    datasets: [{ label:'Open Items', data:[7,13,3,2],
-      backgroundColor:['#C00000','#ED7D31','#C9A227','#2E75B6'],
+    labels:['SBI','HDFC','YBL','Axis'],
+    datasets:[{ label:'Open Items', data:[7,13,3,2],
+      backgroundColor:[C.flame, C.amber, C.cyan, C.blue],
       borderRadius:5, borderSkipped:false }]
   },
   options: {
     responsive:true, maintainAspectRatio:false, indexAxis:'y',
-    plugins:{ legend:{display:false} },
-    scales:{ x:{grid:{color:'#f0f0f0'}, min:0, max:16}, y:{grid:{display:false}} }
+    plugins:{ legend:{display:false}, tooltip:tip },
+    scales:{ x:{grid:{color:'#E0EEF8'}, min:0, max:16}, y:{grid:{display:false}} }
   }
 });
 
-// ── 4. TPAP Donut ──
+// ── 4. TPAP donut ──
 new Chart(document.getElementById('c-tpap'), {
   type: 'doughnut',
   data: {
-    labels: ['Open (67)', 'On Hold (21)', 'Closed (59)', 'Other (7)'],
-    datasets: [{ data:[67,21,59,7],
-      backgroundColor:['#C00000','#ED7D31','#70AD47','#A6A6A6'],
+    labels:['Open (67)','On Hold (21)','Closed (59)','Other (7)'],
+    datasets:[{ data:[67,21,59,7],
+      backgroundColor:[C.flame, C.amber, C.green, C.gray],
       borderColor:'#fff', borderWidth:3, hoverOffset:5 }]
   },
   options: {
     responsive:true, maintainAspectRatio:false, cutout:'65%',
-    plugins:{ legend:{position:'bottom', labels:{boxWidth:10,padding:7,font:{size:9}}} }
+    plugins:{ legend:{position:'bottom', labels:{boxWidth:10, padding:7, font:{size:9}}}, tooltip:tip }
   }
 });
 
-// ── 5. TPAP illustrative closure line ──
+// ── 5. TPAP trend line ──
 new Chart(document.getElementById('c-tpap2'), {
   type: 'line',
   data: {
-    labels: ["Q1'25","Q2'25","Q3'25","Aug'25"],
-    datasets: [
-      { label:'Open', data:[110,95,80,67],
-        borderColor:'#C00000', backgroundColor:'rgba(192,0,0,.08)',
-        fill:true, tension:.4, pointRadius:5, pointBackgroundColor:'#C00000' },
-      { label:'Closed', data:[20,32,48,59],
-        borderColor:'#70AD47', backgroundColor:'rgba(112,173,71,.08)',
-        fill:true, tension:.4, pointRadius:5, pointBackgroundColor:'#70AD47' }
+    labels:["Q1'25","Q2'25","Q3'25","Aug'25"],
+    datasets:[
+      { label:'Open',   data:[110,95,80,67], borderColor:C.flame, backgroundColor:'rgba(239,78,40,.1)',  fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.flame },
+      { label:'Closed', data:[20,32,48,59],  borderColor:C.green, backgroundColor:'rgba(4,219,124,.1)', fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.green }
     ]
   },
   options: {
     responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{position:'bottom', labels:{boxWidth:10,padding:8,font:{size:9}}} },
-    scales:{
-      x:{grid:{display:false}},
-      y:{grid:{color:'#f0f0f0'}, min:0, max:130}
-    }
+    plugins:{ legend:{position:'bottom', labels:{boxWidth:10, padding:8, font:{size:9}}}, tooltip:tip },
+    scales:{ x:{grid:{display:false}}, y:{grid:{color:'#E0EEF8'}, min:0, max:130} }
   }
 });
 
@@ -907,42 +872,40 @@ new Chart(document.getElementById('c-tpap2'), {
 new Chart(document.getElementById('c-cc'), {
   type: 'bar',
   data: {
-    labels: ["Apr'25","May'25","Jun'25","Jul'25","Aug'25"],
-    datasets: [{ label:'Txn Vol (Mn)', data:[187,205,200,205,230],
-      backgroundColor:['#4472C4','#4472C4','#4472C4','#4472C4','#00B0F0'],
+    labels:["Apr'25","May'25","Jun'25","Jul'25","Aug'25"],
+    datasets:[{ label:'Txn Vol (Mn)', data:[187,205,200,205,230],
+      backgroundColor:[C.blue, C.blue, C.blue, C.blue, C.cyan],
       borderRadius:5, borderSkipped:false }]
   },
   options: {
     responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{display:false} },
-    scales:{ x:{grid:{display:false}}, y:{grid:{color:'#f0f0f0'}, min:160, ticks:{callback:v=>v+' Mn'}} }
+    plugins:{ legend:{display:false}, tooltip:tip },
+    scales:{ x:{grid:{display:false}}, y:{grid:{color:'#E0EEF8'}, min:160, ticks:{callback:v=>v+' Mn'}} }
   }
 });
 
 // ── 7. Ecosystem bars ──
 const eco = [
   { rank:1,  name:'PhonePe',       vol:9330.75, pct:46.1, color:'#003087' },
-  { rank:2,  name:'Google Pay',    vol:7027.44, pct:34.8, color:'#34A853' },
-  { rank:3,  name:'Paytm 🔵',     vol:1546.74, pct:7.7,  color:'#00B0F0' },
-  { rank:4,  name:'Navi',          vol:609.45,  pct:3.0,  color:'#70AD47' },
-  { rank:5,  name:'super.money',   vol:265.23,  pct:1.3,  color:'#A6A6A6' },
-  { rank:6,  name:'CRED',          vol:153.54,  pct:0.8,  color:'#A6A6A6' },
-  { rank:7,  name:'BHIM',          vol:141.30,  pct:0.7,  color:'#A6A6A6' },
-  { rank:8,  name:'Amazon Pay',    vol:89.20,   pct:0.4,  color:'#A6A6A6' },
-  { rank:9,  name:'WhatsApp',      vol:87.07,   pct:0.4,  color:'#A6A6A6' },
-  { rank:10, name:'Kotak Apps',    vol:86.36,   pct:0.4,  color:'#A6A6A6' },
+  { rank:2,  name:'Google Pay',    vol:7027.44, pct:34.8, color:'#1a73e8' },
+  { rank:3,  name:'Paytm 🔵',     vol:1546.74, pct:7.7,  color: C.cyan   },
+  { rank:4,  name:'Navi',          vol:609.45,  pct:3.0,  color: C.green  },
+  { rank:5,  name:'super.money',   vol:265.23,  pct:1.3,  color: C.gray   },
+  { rank:6,  name:'CRED',          vol:153.54,  pct:0.8,  color: C.gray   },
+  { rank:7,  name:'BHIM',          vol:141.30,  pct:0.7,  color: C.gray   },
+  { rank:8,  name:'Amazon Pay',    vol:89.20,   pct:0.4,  color: C.gray   },
+  { rank:9,  name:'WhatsApp',      vol:87.07,   pct:0.4,  color: C.gray   },
+  { rank:10, name:'Kotak Apps',    vol:86.36,   pct:0.4,  color: C.gray   },
 ];
 const ecoEl = document.getElementById('ecoList');
 eco.forEach(d => {
-  const bold = d.rank <= 3;
-  const bg   = d.rank === 3 ? 'background:#e3f5ff;border-radius:6px;padding:4px 6px;' : '';
+  const bold  = d.rank <= 3;
+  const hiSty = d.rank === 3 ? 'background:#E0F7FF;border-radius:6px;padding:4px 6px;' : '';
   ecoEl.innerHTML += `
-    <div class="eco-row" style="${bg}">
+    <div class="eco-row" style="${hiSty}">
       <span class="eco-rank">${d.rank}</span>
-      <span class="eco-name" style="font-weight:${bold?800:400}">${d.name}</span>
-      <div class="eco-bar-bg">
-        <div class="eco-bar-fill" style="width:${d.pct/46.1*100}%;background:${d.color}"></div>
-      </div>
+      <span class="eco-name" style="font-weight:${bold?800:400};color:${d.rank===3?C.navy:'inherit'}">${d.name}</span>
+      <div class="eco-bar-bg"><div class="eco-bar-fill" style="width:${d.pct/46.1*100}%;background:${d.color}"></div></div>
       <span class="eco-vol">${d.vol.toLocaleString()} Mn</span>
       <span class="eco-pct">${d.pct}%</span>
     </div>`;
