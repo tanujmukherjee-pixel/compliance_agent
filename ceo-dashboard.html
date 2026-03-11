@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CEO Dashboard — NPCI & PSP Banks</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --dark-blue:   #1F3864;
+    --mid-blue:    #2E75B6;
+    --accent:      #4472C4;
+    --teal:        #00B0F0;
+    --green:       #70AD47;
+    --red:         #C00000;
+    --orange:      #ED7D31;
+    --gold:        #C9A227;
+    --gray:        #595959;
+    --light-gray:  #F4F6F9;
+    --white:       #FFFFFF;
+    --border:      #DEE2E6;
+    --text:        #1a1a2e;
+    --text-muted:  #6c757d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial', sans-serif;
+    background: var(--light-gray);
+    color: var(--text);
+    font-size: 13px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, var(--dark-blue) 0%, #2c4a8a 100%);
+    color: #fff;
+    padding: 22px 32px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    position: sticky; top: 0; z-index: 100;
+  }
+  header h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+  header .meta { font-size: 11px; color: #a8c4e8; margin-top: 4px; }
+  header .badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 11px;
+    color: #d0e8ff;
+    white-space: nowrap;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  main { max-width: 1400px; margin: 0 auto; padding: 24px 24px 40px; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 0;
+  }
+  .section-wrap {
+    background: #fff;
+    border-radius: 0 6px 6px 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .section-body { padding: 20px; }
+
+  /* ── KPI TILES ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    border-radius: 10px;
+    padding: 22px 20px 18px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    right: -20px; top: -20px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .kpi-card .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; opacity: .85; margin-bottom: 10px; }
+  .kpi-card .kpi-value { font-size: 42px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+  .kpi-card .kpi-sub   { font-size: 10px; opacity: .75; line-height: 1.4; }
+  .kpi-blue   { background: linear-gradient(135deg, #2E75B6, #1a4d8a); }
+  .kpi-dark   { background: linear-gradient(135deg, #1F3864, #0d1f3a); }
+  .kpi-red    { background: linear-gradient(135deg, #C00000, #8b0000); }
+  .kpi-orange { background: linear-gradient(135deg, #ED7D31, #b85c16); }
+
+  /* ── TABS ── */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab-btn {
+    padding: 9px 20px;
+    border: none;
+    background: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all .2s;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--dark-blue); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── CHARTS ROW ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .chart-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 18px 18px 14px;
+  }
+  .chart-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--dark-blue);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--light-gray);
+  }
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--dark-blue);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    padding: 10px 12px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 12px;
+    font-size: 11px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f0f4ff !important; }
+  .tbl-striped tbody tr:nth-child(even) td { background: #fafbfc; }
+
+  /* ── BADGES ── */
+  .badge-pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge-open    { background: #fdecea; color: var(--red); border: 1px solid #f5c6c6; }
+  .badge-closed  { background: #e8f5e9; color: #2d7a2d; border: 1px solid #b8ddb8; }
+  .badge-hold    { background: #fff3e0; color: var(--orange); border: 1px solid #ffd49b; }
+  .badge-due     { background: #fffde7; color: var(--gold); border: 1px solid #fce97d; }
+  .badge-p0      { background: #fdecea; color: var(--red); border: 1px solid #f5c6c6; }
+  .badge-p1      { background: #fff3e0; color: var(--orange); border: 1px solid #ffd49b; }
+  .badge-p2      { background: #fffde7; color: var(--gold); border: 1px solid #fce97d; }
+
+  /* ── AGING INDICATOR ── */
+  .aging-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  .age-critical { background: var(--red); }
+  .age-high     { background: var(--orange); }
+  .age-medium   { background: var(--gold); }
+  .age-low      { background: var(--green); }
+
+  /* ── PSP BANK CARDS ── */
+  .bank-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .bank-card {
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: transform .15s;
+  }
+  .bank-card:hover { transform: translateY(-2px); }
+  .bank-card.sbi   { border-color: var(--red); }
+  .bank-card.hdfc  { border-color: var(--orange); }
+  .bank-card.ybl   { border-color: var(--gold); }
+  .bank-card.axis  { border-color: var(--mid-blue); }
+  .bank-name  { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+  .bank-count { font-size: 32px; font-weight: 800; line-height: 1; margin: 8px 0 6px; }
+  .bank-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; }
+  .bank-sub   { font-size: 10px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+
+  /* ── ECOSYSTEM ── */
+  .eco-bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .eco-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .eco-bar-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+  .eco-pct { font-size: 11px; font-weight: 700; width: 42px; text-align: right; color: var(--dark-blue); }
+
+  /* ── MEITY TABLE ── */
+  .meity-status-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 6px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .prog-bar { height: 6px; background: var(--light-gray); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .prog-fill { height: 100%; border-radius: 3px; }
+
+  /* ── SUMMARY STATS ── */
+  .stat-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .stat-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    background: #fff;
+    margin-top: 10px;
+  }
+
+  /* ── TOOLTIP ── */
+  [title] { cursor: help; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+    .charts-row { grid-template-columns: 1fr 1fr; }
+    .bank-grid { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 700px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .charts-row { grid-template-columns: 1fr; }
+    .bank-grid { grid-template-columns: 1fr 1fr; }
+    header { flex-direction: column; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div>
+    <h1>📊 NPCI &amp; PSP Banks — Engagement Dashboard</h1>
+    <div class="meta">CEO Briefing View &nbsp;|&nbsp; Reporting Period: March 2026 &nbsp;|&nbsp; Sources: NPCI Tracker · TPAP Tracker · PSP Open Points · UPI Ecosystem Data</div>
+  </div>
+  <div class="badge">🔒 Confidential — Internal Use Only</div>
+</header>
+
+<main>
+
+  <!-- ══ KPI TILES ══ -->
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-label">NPCI Engagements</div>
+      <div class="kpi-value">42</div>
+      <div class="kpi-sub">28 Open &nbsp;·&nbsp; 6 Closed &nbsp;·&nbsp; 5 On Hold &nbsp;·&nbsp; 3 Due Next Month</div>
+    </div>
+    <div class="kpi-card kpi-dark">
+      <div class="kpi-label">TPAP Tracker Items</div>
+      <div class="kpi-value">154</div>
+      <div class="kpi-sub">67 Open &nbsp;·&nbsp; 59 Closed &nbsp;·&nbsp; 21 On Hold &nbsp;·&nbsp; 7 Other</div>
+    </div>
+    <div class="kpi-card kpi-red">
+      <div class="kpi-label">P0 Critical Items</div>
+      <div class="kpi-value">126</div>
+      <div class="kpi-sub">Highest priority — immediate CEO visibility &amp; action required</div>
+    </div>
+    <div class="kpi-card kpi-orange">
+      <div class="kpi-label">PSP Banks Open Items</div>
+      <div class="kpi-value">25</div>
+      <div class="kpi-sub">SBI 7 &nbsp;·&nbsp; HDFC 13 &nbsp;·&nbsp; YBL 3 &nbsp;·&nbsp; Axis 2</div>
+    </div>
+  </div>
+
+  <!-- ══ CHARTS ROW ══ -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">📌 Status Breakdown — TPAP Tracker</div>
+      <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">🚦 Priority Distribution</div>
+      <div class="chart-wrap"><canvas id="priorityChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">📈 CC on UPI — Monthly Txn Volume (Mn)</div>
+      <div class="chart-wrap"><canvas id="ccChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ══ ENGAGEMENT STATUS ══ -->
+  <div class="section-title">📋 Engagement Status Overview</div>
+  <div class="section-wrap">
+    <div class="section-body" style="padding:0;">
+      <!-- Tabs -->
+      <div style="padding:16px 20px 0;">
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('npci','engTab')">NPCI Summary (6th Feb)</button>
+          <button class="tab-btn" onclick="switchTab('tpap','engTab')">TPAP Tracker</button>
+          <button class="tab-btn" onclick="switchTab('combined','engTab')">Combined View</button>
+        </div>
+      </div>
+      <div style="padding:0 20px 20px;">
+        <!-- NPCI Tab -->
+        <div id="tab-npci" class="tab-content active">
+          <div class="stat-row">
+            <div class="stat-pill" style="background:#fdecea;color:#c00000;">● 28 Open</div>
+            <div class="stat-pill" style="background:#e8f5e9;color:#2d7a2d;">● 6 Closed</div>
+            <div class="stat-pill" style="background:#fff3e0;color:#ed7d31;">● 5 On Hold</div>
+            <div class="stat-pill" style="background:#fffde7;color:#c9a227;">● 3 Due Next Month</div>
+            <div class="stat-pill" style="background:#e3f2fd;color:#1565c0;margin-left:auto;">Total: 42</div>
+          </div>
+          <table class="tbl-striped">
+            <thead>
+              <tr><th>Status</th><th>Count</th><th>% of Total</th><th>Action Required</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge-pill badge-open">Open</span></td>
+                <td><strong>28</strong></td>
+                <td>
+                  <div class="eco-bar-wrap">
+                    <div class="eco-bar-bg"><div class="eco-bar-fill" style="width:66.7%;background:var(--red);"></div></div>
+                    <span class="eco-pct">66.7%</span>
+                  </div>
+                </td>
+                <td style="color:var(--red);">⚡ Immediate attention required</td>
+              </tr>
+              <tr>
+                <td><span class="badge-pill badge-hold">Open (On Hold)</span></td>
+                <td><strong>5</strong></td>
+                <td>
+                  <div class="eco-bar-wrap">
+                    <div class="eco-bar-bg"><div class="eco-bar-fill" style="width:11.9%;background:var(--orange);"></div></div>
+                    <span class="eco-pct">11.9%</span>
+                  </div>
+                </td>
+                <td style="color:var(--orange);">🔒 Blocked — escalation needed</td>
+              </tr>
+              <tr>
+                <td><span class="badge-pill badge-closed">Closed</span></td>
+                <td><strong>6</strong></td>
+                <td>
+                  <div class="eco-bar-wrap">
+                    <div class="eco-bar-bg"><div class="eco-bar-fill" style="width:14.3%;background:var(--green);"></div></div>
+                    <span class="eco-pct">14.3%</span>
+                  </div>
+                </td>
+                <td style="color:var(--green);">✅ Completed</td>
+              </tr>
+              <tr>
+                <td><span class="badge-pill badge-due">Due Next Month</span></td>
+                <td><strong>3</strong></td>
+                <td>
+                  <div class="eco-bar-wrap">
+                    <div class="eco-bar-bg"><div class="eco-bar-fill" style="width:7.1%;background:var(--gold);"></div></div>
+                    <span class="eco-pct">7.1%</span>
+                  </div>
+                </td>
+                <td style="color:var(--gold);">👁️ Monitor closely</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- TPAP Tab -->
+        <div id="tab-tpap" class="tab-content">
+          <div class="stat-row">
+            <div class="stat-pill" style="background:#fdecea;color:#c00000;">● 67 Open</div>
+            <div class="stat-pill" style="background:#e8f5e9;color:#2d7a2d;">● 59 Closed</div>
+            <div class="stat-pill" style="background:#fff3e0;color:#ed7d31;">● 21 On Hold</div>
+            <div class="stat-pill" style="background:#fffde7;color:#c9a227;">● 7 Other</div>
+            <div class="stat-pill" style="background:#e3f2fd;color:#1565c0;margin-left:auto;">Total: 154</div>
+          </div>
+          <table class="tbl-striped">
+            <thead>
+              <tr><th>Status</th><th>Count</th><th>% of Total</th><th>Action Required</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="badge-pill badge-open">Open</span></td><td><strong>67</strong></td>
+                <td><div class="eco-bar-wrap"><div class="eco-bar-bg"><div class="eco-bar-fill" style="width:43.5%;background:var(--red);"></div></div><span class="eco-pct">43.5%</span></div></td>
+                <td style="color:var(--red);">⚡ Immediate attention required</td></tr>
+              <tr><td><span class="badge-pill badge-hold">Open (On Hold)</span></td><td><strong>21</strong></td>
+                <td><div class="eco-bar-wrap"><div class="eco-bar-bg"><div class="eco-bar-fill" style="width:13.6%;background:var(--orange);"></div></div><span class="eco-pct">13.6%</span></div></td>
+                <td style="color:var(--orange);">🔒 Blocked — escalation needed</td></tr>
+              <tr><td><span class="badge-pill badge-closed">Closed</span></td><td><strong>59</strong></td>
+                <td><div class="eco-bar-wrap"><div class="eco-bar-bg"><div class="eco-bar-fill" style="width:38.3%;background:var(--green);"></div></div><span class="eco-pct">38.3%</span></div></td>
+                <td style="color:var(--green);">✅ Completed</td></tr>
+              <tr><td><span class="badge-pill badge-due">TBD / Due / Not Due</span></td><td><strong>7</strong></td>
+                <td><div class="eco-bar-wrap"><div class="eco-bar-bg"><div class="eco-bar-fill" style="width:4.5%;background:var(--gold);"></div></div><span class="eco-pct">4.5%</span></div></td>
+                <td style="color:var(--gold);">📅 In planning / not yet due</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Combined Tab -->
+        <div id="tab-combined" class="tab-content">
+          <div class="stat-row">
+            <div class="stat-pill" style="background:#e3f2fd;color:#1565c0;">Total Items: 196</div>
+            <div class="stat-pill" style="background:#fdecea;color:#c00000;">● 95 Open (48%)</div>
+            <div class="stat-pill" style="background:#e8f5e9;color:#2d7a2d;">● 65 Closed (33%)</div>
+            <div class="stat-pill" style="background:#fff3e0;color:#ed7d31;">● 26 On Hold (13%)</div>
+            <div class="stat-pill" style="background:#fffde7;color:#c9a227;">● 10 Other (5%)</div>
+          </div>
+          <table class="tbl-striped">
+            <thead>
+              <tr><th>Priority</th><th>NPCI Summary</th><th>TPAP Tracker</th><th>Combined Total</th><th>Urgency Level</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="badge-pill badge-p0">P0 — Critical</span></td><td>31</td><td>95</td><td><strong>126</strong></td><td style="color:var(--red);">🔴 Mission-Critical — CEO Visibility</td></tr>
+              <tr><td><span class="badge-pill badge-p1">P1 — High</span></td><td>60</td><td>61</td><td><strong>121</strong></td><td style="color:var(--orange);">🟠 High Priority — Weekly Review</td></tr>
+              <tr><td><span class="badge-pill badge-p2">P2 — Medium</span></td><td>7</td><td>9</td><td><strong>16</strong></td><td style="color:var(--gold);">🟡 Track Monthly</td></tr>
+              <tr style="background:#f0f4ff;"><td><strong>TOTAL</strong></td><td><strong>98</strong></td><td><strong>165</strong></td><td><strong>263</strong></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PSP BANK STATUS ══ -->
+  <div class="section-title">🏦 PSP Bank Open Items — Current Status</div>
+  <div class="section-wrap">
+    <div class="section-body">
+      <div class="bank-grid">
+        <div class="bank-card sbi">
+          <div class="bank-label">PSP Bank</div>
+          <div class="bank-name" style="color:var(--red);">SBI</div>
+          <div class="bank-count" style="color:var(--red);">7</div>
+          <div class="bank-label">Open Items</div>
+          <div class="bank-sub">
+            <span class="badge-pill badge-p0">P0</span>
+            <span style="margin-left:6px;">OC215, UDIR Callback, Invoicing Recon</span><br/>
+            ⏱ Oldest: <strong>&gt;1 Year</strong> (Invoicing — May'24)
+          </div>
+        </div>
+        <div class="bank-card hdfc">
+          <div class="bank-label">PSP Bank</div>
+          <div class="bank-name" style="color:var(--orange);">HDFC</div>
+          <div class="bank-count" style="color:var(--orange);">13</div>
+          <div class="bank-label">Open Items</div>
+          <div class="bank-sub">
+            <span class="badge-pill badge-p0">P0</span>
+            <span style="margin-left:6px;">UDIR Callback, Profile Sync, Recon</span><br/>
+            ⏱ Oldest: <strong>&gt;6 Months</strong> (UDIR — Jul'25)
+          </div>
+        </div>
+        <div class="bank-card ybl">
+          <div class="bank-label">PSP Bank</div>
+          <div class="bank-name" style="color:var(--gold);">Yes Bank</div>
+          <div class="bank-count" style="color:var(--gold);">3</div>
+          <div class="bank-label">Open Items</div>
+          <div class="bank-sub">
+            <span class="badge-pill badge-p1">P1</span>
+            <span style="margin-left:6px;">URCS Access, Device Binding, Fee</span><br/>
+            ⏱ Oldest: <strong>&gt;8 Months</strong> (URCS — May'25)
+          </div>
+        </div>
+        <div class="bank-card axis">
+          <div class="bank-label">PSP Bank</div>
+          <div class="bank-name" style="color:var(--mid-blue);">Axis Bank</div>
+          <div class="bank-count" style="color:var(--mid-blue);">2</div>
+          <div class="bank-label">Open Items</div>
+          <div class="bank-sub">
+            <span class="badge-pill badge-p1">P1</span>
+            <span style="margin-left:6px;">Device Binding Token, NRE/NRO</span><br/>
+            ⏱ Oldest: <strong>&gt;7 Months</strong> (Jun'25)
+          </div>
+        </div>
+      </div>
+
+      <!-- SBI Detail Table -->
+      <div style="font-size:11px;font-weight:700;color:var(--dark-blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;margin-top:4px;">
+        SBI — Top Open Items (Latest Status Feb'26)
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Feature / Issue</th>
+            <th>Current Status</th>
+            <th>Pending At</th>
+            <th>Aging</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td><td>OC 215 Check Status Implementation</td>
+            <td>ETA awaited for Prod deployment. Sanity signoff shared 28th Jan.</td>
+            <td>SBI</td>
+            <td><span style="display:inline-flex;align-items:center;"><span class="aging-dot age-high"></span>&gt; 3 Months</span></td>
+          </tr>
+          <tr>
+            <td>2</td><td>Alternate Device Binding — Reverse SMS</td>
+            <td>Feature to be prioritized. ETA awaited. Joint call to be scheduled.</td>
+            <td>SBI</td>
+            <td><span style="display:inline-flex;align-items:center;"><span class="aging-dot age-high"></span>&gt; 2 Months</span></td>
+          </tr>
+          <tr>
+            <td>3</td><td>Alternate Device Binding — SMV</td>
+            <td>Feature to be prioritized. ETA awaited.</td>
+            <td>SBI</td>
+            <td><span style="display:inline-flex;align-items:center;"><span class="aging-dot age-high"></span>&gt; 2 Months</span></td>
+          </tr>
+          <tr style="background:#fdecea;">
+            <td>4</td><td>UDIR Callback for Refund (OC165)</td>
+            <td>Issues in UAT testing. Rohan to confirm URL configured at Bank. Awaited.</td>
+            <td>SBI/MGS</td>
+            <td><span style="display:inline-flex;align-items:center;"><span class="aging-dot age-critical"></span><strong style="color:var(--red);">&gt; 5 Months</strong></span></td>
+          </tr>
+          <tr style="background:#fdecea;">
+            <td>5</td><td>Invoicing — Incentive</td>
+            <td>Aug'25–Jan'26 invoicing computation in progress. Filing this week.</td>
+            <td>SBI</td>
+            <td><span style="display:inline-flex;align-items:center;"><span class="aging-dot age-critical"></span><strong style="color:var(--red);">&gt; 1 Year</strong></span></td>
+          </tr>
+          <tr style="background:#fdecea;">
+            <td>6</td><td>NTSL &amp; GST Files — ptsbi handle</td>
+            <td>Files for FY'25 expected by March first week from SBI/NPCI.</td>
+            <td>SBI/NPCI</td>
+            <td><span style="display:inline-flex;align-items:center;"><span class="aging-dot age-critical"></span><strong style="color:var(--red);">&gt; 1 Year</strong></span></td>
+          </tr>
+          <tr style="background:#e8f5e9;">
+            <td>7</td><td>Autopay Interoperability</td>
+            <td>In Dev at Paytm. Pending clarifications received 3rd Feb.</td>
+            <td>Paytm</td>
+            <td><span style="display:inline-flex;align-items:center;"><span class="aging-dot age-low"></span>&lt; 1 Month</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ UPI ECOSYSTEM ══ -->
+  <div class="section-title">🌐 UPI Ecosystem — Market Share &amp; Trends</div>
+  <div class="section-wrap">
+    <div class="section-body">
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:start;">
+
+        <!-- App-wise market share -->
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--dark-blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">App-wise UPI Volume — Nov 2025</div>
+          <table>
+            <thead>
+              <tr><th>#</th><th>Application</th><th>Volume (Mn)</th><th>Value (Cr)</th><th>Market Share</th></tr>
+            </thead>
+            <tbody id="ecoTable">
+              <!-- JS populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- UPI Lite trend -->
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--dark-blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">UPI Lite — Monthly Trend</div>
+          <div class="chart-wrap" style="height:180px;"><canvas id="liteChart"></canvas></div>
+          <div style="margin-top:16px;">
+            <div style="font-size:11px;font-weight:700;color:var(--dark-blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">UPI Circle — Snapshot</div>
+            <table>
+              <thead><tr><th>Month</th><th>Txn Volume (Mn)</th><th>Txn Value (Cr)</th></tr></thead>
+              <tbody>
+                <tr><td>May'25</td><td>1.24</td><td>30</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:10px;padding:10px 12px;background:#e3f2fd;border-radius:6px;font-size:11px;color:var(--mid-blue);">
+              ℹ️ UPI Circle in early ramp-up phase — data for select months only.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MEITY INCENTIVES ══ -->
+  <div class="section-title">💰 Meity Incentive Status — PSP Bank Wise</div>
+  <div class="section-wrap">
+    <div class="section-body" style="padding:0;">
+      <table>
+        <thead>
+          <tr>
+            <th>PSP Bank</th>
+            <th>Acquiring Incentive</th>
+            <th>Issuing — PSP Fee</th>
+            <th>Issuing — TPAP Fee</th>
+            <th>Paytm Revenue Share</th>
+            <th>Invoice Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>HDFC</strong></td>
+            <td>Pending (GST clarity awaited)</td>
+            <td>₹34.39 L</td>
+            <td>₹2.29 Cr</td>
+            <td>30% (PSP) / 100% (TPAP)</td>
+            <td><span class="meity-status-dot" style="background:var(--orange);"></span>Invoice pending — GST applicability from HDFC</td>
+          </tr>
+          <tr>
+            <td><strong>Yes Bank</strong></td>
+            <td>₹51.72 Cr</td>
+            <td>₹3.49 Cr</td>
+            <td>₹6.98 Cr</td>
+            <td>85% share</td>
+            <td><span class="meity-status-dot" style="background:var(--gold);"></span>Invoice shared. Awaiting payment.</td>
+          </tr>
+          <tr>
+            <td><strong>Axis Bank</strong></td>
+            <td>—</td>
+            <td>₹45.72 L</td>
+            <td>₹3.05 Cr</td>
+            <td>30% (PSP) / 100% (TPAP)</td>
+            <td><span class="meity-status-dot" style="background:var(--green);"></span>Invoice shared. <strong>Payment completed.</strong></td>
+          </tr>
+          <tr>
+            <td><strong>SBI</strong></td>
+            <td>—</td>
+            <td>—</td>
+            <td>₹2.94 Cr</td>
+            <td>100% share</td>
+            <td><span class="meity-status-dot" style="background:var(--gold);"></span>Q1–Q3 paid. Q4 invoice pending.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  CONFIDENTIAL — Internal Use Only &nbsp;|&nbsp; Paytm Payments Bank Limited &nbsp;|&nbsp;
+  Data Sources: NPCI Engagement Tracker · TPAP Tracker · PSP Bank Open Points · UPI Ecosystem NPCI Data &nbsp;|&nbsp;
+  Dashboard as of March 2026
+</footer>
+
+<script>
+// ── Utility ──
+function switchTab(tabId, groupId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── Chart defaults ──
+Chart.defaults.font.family = 'Arial, sans-serif';
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = '#595959';
+
+// ── 1. Status Donut ──
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Open', 'On Hold', 'Closed', 'TBD / Other'],
+    datasets: [{
+      data: [67, 21, 59, 7],
+      backgroundColor: ['#C00000','#ED7D31','#70AD47','#A6A6A6'],
+      borderColor: '#fff',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '62%',
+    plugins: {
+      legend: { position: 'right', labels: { boxWidth: 12, padding: 10, font: { size: 10 } } },
+      tooltip: { callbacks: {
+        label: ctx => ` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/154*100)}%)`
+      }}
+    }
+  }
+});
+
+// ── 2. Priority Bar ──
+new Chart(document.getElementById('priorityChart'), {
+  type: 'bar',
+  data: {
+    labels: ['P0 — Critical', 'P1 — High', 'P2 — Medium', 'Unassigned'],
+    datasets: [{
+      label: 'Items',
+      data: [126, 121, 16, 6],
+      backgroundColor: ['#C00000','#ED7D31','#C9A227','#A6A6A6'],
+      borderRadius: 5,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+      y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 9 } } }
+    }
+  }
+});
+
+// ── 3. CC on UPI Trend ──
+new Chart(document.getElementById('ccChart'), {
+  type: 'bar',
+  data: {
+    labels: ["Apr'25", "May'25", "Jun'25", "Jul'25", "Aug'25"],
+    datasets: [{
+      label: 'Txn Volume (Mn)',
+      data: [187, 205, 200, 205, 230],
+      backgroundColor: ctx => {
+        const v = ctx.raw;
+        if(v >= 220) return '#00B0F0';
+        if(v >= 200) return '#2E75B6';
+        return '#4472C4';
+      },
+      borderRadius: 5,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: {
+        label: ctx => ` ${ctx.raw} Mn txns`
+      }}
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#f0f0f0' }, min: 160, ticks: { callback: v => v + ' Mn' } }
+    }
+  }
+});
+
+// ── 4. UPI Lite Trend ──
+new Chart(document.getElementById('liteChart'), {
+  type: 'line',
+  data: {
+    labels: ["Apr'25", "May'25", "Jun'25", "Jul'25"],
+    datasets: [{
+      label: 'UPI Lite Volume (Mn)',
+      data: [77, 80, 80, 89],
+      borderColor: '#00B0F0',
+      backgroundColor: 'rgba(0,176,240,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 5,
+      pointHoverRadius: 7,
+      pointBackgroundColor: '#00B0F0'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#f0f0f0' }, min: 60, ticks: { callback: v => v + ' Mn' } }
+    }
+  }
+});
+
+// ── Ecosystem Table ──
+const ecoData = [
+  { rank:1, app:'PhonePe',            vol:9330.75, val:1275351, share:46.1, color:'#1F3864' },
+  { rank:2, app:'Google Pay',         vol:7027.44, val:905934,  share:34.8, color:'#2E75B6' },
+  { rank:3, app:'Paytm',              vol:1546.74, val:164155,  share:7.7,  color:'#00B0F0' },
+  { rank:4, app:'Navi',               vol:609.45,  val:32290,   share:3.0,  color:'#70AD47' },
+  { rank:5, app:'super.money',        vol:265.23,  val:10581,   share:1.3,  color:'#70AD47' },
+  { rank:6, app:'CRED',               vol:153.54,  val:59261,   share:0.8,  color:'#A6A6A6' },
+  { rank:7, app:'BHIM',               vol:141.30,  val:18377,   share:0.7,  color:'#A6A6A6' },
+  { rank:8, app:'Amazon Pay',         vol:89.20,   val:10147,   share:0.4,  color:'#A6A6A6' },
+  { rank:9, app:'WhatsApp',           vol:87.07,   val:7168,    share:0.4,  color:'#A6A6A6' },
+  { rank:10, app:'Kotak Bank Apps',   vol:86.36,   val:10355,   share:0.4,  color:'#A6A6A6' },
+];
+const tbody = document.getElementById('ecoTable');
+ecoData.forEach(d => {
+  const bold = d.rank <= 3;
+  const highlight = d.rank === 3 ? 'background:#e3f5ff;' : '';
+  tbody.innerHTML += `
+    <tr style="${highlight}">
+      <td>${d.rank}</td>
+      <td style="font-weight:${bold?'700':'400'};color:${d.rank===3?'var(--mid-blue)':'inherit'}">${d.app}${d.rank===3?' 🔵':''}</td>
+      <td style="text-align:right">${d.vol.toLocaleString()}</td>
+      <td style="text-align:right">${d.val.toLocaleString()}</td>
+      <td>
+        <div class="eco-bar-wrap">
+          <div class="eco-bar-bg">
+            <div class="eco-bar-fill" style="width:${d.share/46.1*100}%;background:${d.color};"></div>
+          </div>
+          <span class="eco-pct">${d.share}%</span>
+        </div>
+      </td>
+    </tr>`;
+});
+</script>
+</body>
+</html>
